@@ -8,7 +8,8 @@
 #   starts the game
 
 import sys
-from users import SyncFood
+from users import Food, Human
+from movement import KeyInput, Stationary
 
 import SyncGameBoard
 
@@ -19,8 +20,17 @@ def main(argv):
 	#syncGameBoard = SyncGameBoard(BOARD_WIDTH, BOARD_HEIGHT)
 	#print(syncGameBoard)
 
-	syncFood = SyncFood(5)
+	syncFood = Food(5)
 	syncFood.expose()
+
+	syncHuman = Human((3,4), KeyInput(	leftKey 	= "a", 
+										rightKey 	= "d", 
+										upKey 		= "w",
+										downKey 	= "s"))
+	syncHuman.expose()
+	syncHuman.move("a")
+	syncHuman.move("a")
+	syncHuman.move("w")
 
 	return
 

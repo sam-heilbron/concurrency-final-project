@@ -8,10 +8,23 @@
 #   List of user classes
 
 import threading
-from movement import Stationary, Human
+from movement import Stationary, KeyInput
 
-## Represents the canvas that a group of artists could work on
-class SyncBlob(object):
+
+class Blob(object):
+
+    """A blob. Base class for all users.
+
+    Attributes:
+        pos: A tuple representing the (x,y) coordinates.
+        size: The size of the blob.
+        movement: The class defining how a blob moves.
+        canGrow: Whether or not a blob can grow.
+        isAlive: Semaphore representing life of blob.
+        lock: Mutex to force atomic access.
+    """
+
+    ###@TODO: Add list of pixels that user "owns"
     def __init__(   self, 
                     initialPos,
                     initialSize     = 1, 
@@ -37,23 +50,53 @@ class SyncBlob(object):
     def getCanGrow(self):
         return self.__canGrow
 
+    def setPos(self, newPos):
+        self.__pos = newPos
+
     def expose(self):
         print("Size: %s \nPos: %s \nMovement: %s\n" % \
          (self.__size, self.__pos, self.__movement))
 
 
-class SyncFood(SyncBlob):
+class Food(Blob):
+    """A Food item.
+
+    Attributes:
+        pos: A tuple representing the (x,y) coordinates.
+        size: The size of the blob.
+        movement: movement is Stationary.
+        canGrow: Food CANNOT grow.
+        isAlive: Semaphore representing life of the food.
+        lock: Mutex to force atomic access.
+    """
 
     def __init__(self, initialPos):
-        SyncBlob.__init__(  self, 
-                            initialPos = initialPos)
+        """ Create a Food item """
+        Blob.__init__(  self, 
+                        initialPos = initialPos)
 
 
-class SyncHuman(SyncBlob):
+class Human(Blob):
+    """A Human player.
 
-    def __init__(self, initialPos):
-        SyncBlob.__init__(  self, 
-                            initialPos      = initialPos, 
-                            initialSize     = 4,
-                            movementClass   = Human,
-                            canGrow         = True)
+    Attributes:
+        pos: A tuple representing the (x,y) coordinates.
+        size: The size of the human.
+        movement: movement is Human.
+        canGrow: Human CAN grow.
+        isAlive: Semaphore representing life of the human.
+        lock: Mutex to force atomic access.
+    """
+
+    def __init__(self, initialPos, movementClass):
+        """ Create a Human player """
+        Blob.__init__(  self, 
+                        initialPos      = initialPos, 
+                        initialSize     = 4,
+                        movementClass   = movementClass,
+                        canGrow         = True)
+
+    def move(self, keyPressed):
+        self.setPos(
+            self.getMovement().move(*self.getPos(), keyPressed))
+        print(str(self.getPos()))
