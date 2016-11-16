@@ -8,7 +8,8 @@
 #   List of user classes
 
 import threading
-from movement import Stationary, KeyInput
+from decisions import Stationary, KeyInput
+from movements import Sphere
 
 
 class Blob(object):
@@ -19,7 +20,6 @@ class Blob(object):
         pos: A tuple representing the (x,y) coordinates.
         size: The size of the blob.
         movement: The class defining how a blob moves.
-        canGrow: Whether or not a blob can grow.
         isAlive: Semaphore representing life of blob.
         lock: Mutex to force atomic access.
     """
@@ -28,13 +28,11 @@ class Blob(object):
     def __init__(   self, 
                     initialPos,
                     initialSize     = 1, 
-                    movementClass   = Stationary, 
-                    canGrow         = False):
-        self.__pos      = initialPos
-        self.__size     = initialSize
+                    decisionClass   = Stationary
+                    movementClass   = Sphere):
+        self.__decision = decisionC
         self.__movement = movementClass
 
-        self.__canGrow  = canGrow
         self.__isAlive  = threading.Semaphore(1)
         self.__lock     = threading.Lock()
 
@@ -46,9 +44,6 @@ class Blob(object):
 
     def getMovement(self):
         return self.__movement
-
-    def getCanGrow(self):
-        return self.__canGrow
 
     def setPos(self, newPos):
         self.__pos = newPos
@@ -65,7 +60,6 @@ class Food(Blob):
         pos: A tuple representing the (x,y) coordinates.
         size: The size of the blob.
         movement: movement is Stationary.
-        canGrow: Food CANNOT grow.
         isAlive: Semaphore representing life of the food.
         lock: Mutex to force atomic access.
     """
@@ -83,20 +77,19 @@ class Human(Blob):
         pos: A tuple representing the (x,y) coordinates.
         size: The size of the human.
         movement: movement is Human.
-        canGrow: Human CAN grow.
         isAlive: Semaphore representing life of the human.
         lock: Mutex to force atomic access.
     """
 
-    def __init__(self, initialPos, movementClass):
+    def __init__(self, initialPos, decisionClass, movementClass):
         """ Create a Human player """
         Blob.__init__(  self, 
                         initialPos      = initialPos, 
                         initialSize     = 4,
-                        movementClass   = movementClass,
-                        canGrow         = True)
+                        decisionClass   = decisionClass
+                        movementClass   = movementClass)
 
     def move(self, keyPressed):
         self.setPos(
-            self.getMovement().move(*self.getPos(), keyPressed))
+            self.getMovement().move(self.getPos(), keyPressed))
         print(str(self.getPos()))
