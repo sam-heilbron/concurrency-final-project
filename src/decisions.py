@@ -3,18 +3,19 @@
 #   decisions.py
 #
 #   Sam Heilbron
-#   Last Updated: November 12, 2016
+#   Last Updated: November 16, 2016
 #
 #   List of decision classes
-
+##
+##  super(ClassName, self).__init__()
+##
 
 from collections import defaultdict
 
 class Basic(object):
-    def __init__(self):
-        self.__name = "Basic"
+    """ Base class for all decision classes """
 
-    def continueDirection(currentPosition):
+    def continueDirection(self, currentPosition):
         currentPosition.continueDirection();
 
     def goLeft(self, currentPosition):
@@ -32,31 +33,28 @@ class Basic(object):
 
 
 class Stationary(Basic):
-
-    def __init__(self):
-        Basic.__init__()
+    """ Decision class for a Stationary player """
 
     def move(self, currentPosition):
         currentPosition.stayInPlace()
 
 
+
 class KeyInput(Basic):
+    """ Decision class for keyboard inputs
+
+    Attributes:
+        directions: Map of key inputs to methods
+    """
 
     def __init__(self, leftKey, rightKey, upKey, downKey):
-        Basic.__init__()
-
-        self.__leftKey      = leftKey
-        self.__rightKey     = rightKey
-        self.__upKey        = upKey
-        self.__downKey      = downKey
-
         self.__directions   = defaultdict(
             lambda: self.continueDirection,
             {
-                self.__leftKey  : self.goLeft,
-                self.__rightKey : self.goRight,
-                self.__upKey    : self.goUp,
-                self.__downKey  : self.goDown
+                leftKey  : self.goLeft,
+                rightKey : self.goRight,
+                upKey    : self.goUp,
+                downKey  : self.goDown
             }
         )
 
@@ -65,9 +63,7 @@ class KeyInput(Basic):
 
 
 class AIInput(Basic):
-
-    def __init__(self):
-        Basic.__init__()
+    """ Decision class for AI input (auto-move) """
 
     def move(self, currentPosition):
         print("ai move")
