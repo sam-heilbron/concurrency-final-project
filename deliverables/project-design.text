@@ -1,0 +1,112 @@
+project-design.text
+
+Class: Comp50-Concurrency
+Last Updated: Monday November 21, 2016
+Authors: Rachel Marison, Sam Heilbron
+Github: https://github.com/slh93/concurrency-final-project/
+Branch: Develop
+
+This file contains the refined project design for the final project
+
+Team Name: 
+    Meow
+
+Team Members: 
+    Rachel Marison, Sam Heilbron
+
+Project Idea: 
+    This is a game of tag, very similar to Agar.io (check it out in
+    your web browser). Basically, users join a game and they move around an
+    enclosed space as a spehere trying to "eat" others. When they do, they 
+    become larger and as a result slower. If you are eaten, you are eliminated.
+    To "eat" someone you must completely overlap their positition with yours. 
+    Just touching them doesn't result in anything. There are also small food 
+    items sitting around that don't move and allow players to get food easily. 
+    Players may also split themselves in half, and have 2 smaller spheres 
+    moving around together. This allows them to move faster, but makes it harder
+    to eat others since they're smaller.
+
+Design:
+    Desicions:
+        Decisions are a subclass of users because they are a core component
+    of a user but can vary between different users. The options at the
+    moment are Stationary (the user never moves), KeyInput (the user waits
+    for keyboard inputs to determine its directions) and AiInput (the
+    direction is randomly assigned).
+
+    Movements:
+        Movement classes determine how a blob grows, and moves it. At the 
+    moment, the only movement class that exists is the Sphere class which
+    grows in a circle. Movement in any direction will move the entire blob,
+    until it reaches a border. The speed of the user will slow as the size
+    increases.
+
+    Users:
+        Users all stem from the base "blob" class. A user contains a semaphore
+    denoting whether or not it is alive, a mutex to ensure atomic access to 
+    class variables, a decision class which decides in what direction a blob
+    moves and a movement class which decides how a blob moves. At the moment,
+    there are two types of users in the game. Humans are users with a KeyInput
+    decision class and a Sphere movement class. Food are users with a
+    Stationary decision class and a Sphere movement class. 
+        Each user will operate in its own thread and the thread will live as
+    long as the isAlive semaphore that each blob contains is true. Humans 
+    however will hold a thread which handles Key inputs in one thread and 
+    actual movement in another. 
+
+    Boards:
+        The only board we have at the moment is a synchronous board which 
+    ensures that only one player can live in a space at once. 
+
+    Games:
+        A game consists of a Board and a list of Users. This still needs to 
+    be implemented.
+
+    You can see the updated class changes at:
+        https://github.com/slh93/concurrency-final-project/tree/develop/src
+
+Overview of Changes:
+    Our user classes were changed from the previous design to reflect the 
+intricacies of users. Before, we had a single class for all users with
+varying class values. However, now we have separated the ideas of decision
+making and movement and separated both of those from the idea of a user.
+In other words a user not only has a way to make decisions and implement
+those decisions but also ensures atomic access with the game board. 
+    These changes provide necessary modularity and make it a lot easier
+to introduce new user types since all that is required is making new
+decision or movement classes. 
+
+In addition we solved a corner case that we were worried about. If more
+than 1 blob tries to eat another, the first will eat it, and all others
+will block while the lock is in use. However, after the smaller blob
+has been eaten, all the other threads are waiting on a thread that has
+died. We got a basic working example which you can see at:
+    https://github.com/slh93/concurrency-final-project
+        /blob/develop/deliverables/agar.py
+
+By acquiring the lock and passing it False (is_alive.acquire(False)), we
+ensure that all blocking threads will continue as normal if the thread
+they are waiting on has died. This way blocking threads will not deadlock
+or crash. 
+
+Current Challenge:
+    At the moment, it is challenging the grow the blob in an efficient yet
+    symmetrical way. For example, if a blob is a size of 2 and then it eats
+    a food item, it should grow but the 3rd pixel should form a triangle
+    and not a line. Ensuring that it grows towards a Sphere has been hard.
+
+Futher Goals:
+    First, we would like to get everything working together in the next week.
+    Next, it would be interesting to try to distribute the game so that users
+    can play on multiple computers. Alternatively, making the game board
+    bigger than the screen and only showing the user the section of the board
+    that they are near would be an interesting challenge. It seems as though
+    we will be focusing more on game features and less on visualization.
+
+Timeline:
+    11/28: Working basic version (with updated modular design)
+    12/4: Determine if distributed system is possible and if so, get basic
+        working version
+    12/8: Working version with distribution and board larger than screen size
+
+

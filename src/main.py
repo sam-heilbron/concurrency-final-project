@@ -3,38 +3,50 @@
 #   main.py
 #
 #   Sam Heilbron
-#   Last Updated: November 12, 2016
+#   Last Updated: November 21, 2016
 #
 #   starts the game
 
 import sys
 from users import Food, Human
-from decisions import KeyInput, Stationary
-from movements import Sphere
+from boards import SyncGameBoard
+from decisions import KeyInput, MouseInput
+from games import Game
+from enums import Color
 
-
-BOARD_WIDTH = 7
-BOARD_HEIGHT = 5
+import pygame
+import pyautogui
 
 def main(argv):
+	pygame.init()
+	
+	board = SyncGameBoard()
+	board.initialize()
 
-	human = Human(1, [(1,2), (1,3)])
-	human.expose()
+	keyInput = KeyInput()
+	mouseInput = MouseInput()
 
-	human.move("a")
-	human.move("j")
-	human.expose()
-	human.move("a")
-	human.expose()
-	human.move("a")
-	human.expose()
+	human = Human(1, (100,200), mouseInput)
+	human.start(board)
 
+	"""
+	print("reached here\n\n\n\n\n")
+	while 1:
+		print("DISPLAY BOARD")
+		board.updateBackground()
+		human.draw()
+		board.updateDisplay()
+		sleep(1000)
+
+	#game = Game([human], board)
+	#game.start()
+
+	"""
 
 	return
 
 
-
 if __name__ == '__main__':
-  main(sys.argv)
+	main(sys.argv)
 
 

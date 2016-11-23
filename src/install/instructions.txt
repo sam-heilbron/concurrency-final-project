@@ -1,0 +1,5 @@
+1. Change in getch-1.0 direction and run "python setup.py install"
+2. Follow instructions at:
+	http://stackoverflow.com/questions/22974339/pygame-installation-issue-in-mac-os
+3. Follow the instructions at:
+	http://pyautogui.readthedocs.io/en/latest/install.html
