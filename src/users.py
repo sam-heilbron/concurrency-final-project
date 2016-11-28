@@ -10,7 +10,7 @@
 import threading
 from decisions import Stationary, KeyInput
 from movements import _Circle
-from enums import InitialUserRadius
+from enums import InitialUserRadius, Color
 
 
 class Blob(object):
