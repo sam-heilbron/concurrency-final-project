@@ -54,7 +54,6 @@ class _Circle(object):
     def setCurrentDirection(self, direction):
         with self.__directionMutex:
             self.__direction = direction
-            print("New direction: %s" % direction)
 
 
 ##

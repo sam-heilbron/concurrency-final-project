@@ -13,7 +13,7 @@ from enums import Color
 
 ## Represents the board that a group of users share
 class SyncGameBoard(object):
-    def __init__(self, width = 700, height = 700):
+    def __init__(self, width = 800, height = 700):
         self.__width        = width
         self.__height       = height  
         #self.__locks       = self.initGameBoard(threading.Lock())
@@ -41,11 +41,16 @@ class SyncGameBoard(object):
 
 
     def initializeTitle(self):
-        font = pygame.font.Font(None, 36)
-        text = font.render("TAG", 1, Color.BLACK)
-        textpos = text.get_rect(centerx = self.__background.get_width()/2)
-        self.__background.blit(text, textpos)
-
+        titleFont = pygame.font.Font(None, 50)
+        titleText = titleFont.render("TAG", 1, Color.BLACK)
+        titleTextpos = titleText.get_rect(
+                            centerx = self.__background.get_width()/2)
+        helpFont = pygame.font.Font(None, 36)
+        helpText = helpFont.render("Press q to quit", 1, Color.RED)
+        helpTextpos = helpText.get_rect(
+                            right = self.__background.get_width() - 10)
+        self.__background.blit(titleText, titleTextpos)
+        self.__background.blit(helpText, helpTextpos)
 
     def updateDisplay(self):
         pygame.display.flip()

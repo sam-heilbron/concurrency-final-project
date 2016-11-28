@@ -73,21 +73,23 @@ class Food(Blob):
                                             initialCenter, 
                                             InitialUserRadius.FOOD))
 
-    def start(self, gameboard):
+    def start(self, gameboard, gameOverFlag):
         """ Spin up threads for making decisions and moving """
         decisionThread = threading.Thread(
                             target = self.getDecision().waitForDecision,
-                            args = [self.getMovement()])
+                            args = [self.getMovement(), gameOverFlag])
         movementThread = threading.Thread(
                             target = self.moveAtInterval,
-                            args = [gameboard])
+                            args = [gameboard, gameOverFlag])
         decisionThread.start()
         movementThread.start()
 
 
-    def moveAtInterval(self, gameboard):
+    def moveAtInterval(self, gameboard, gameOverFlag):
         """ Move a food item based on decision class (Stationary) """
-        self.getMovement().move()
+        while not gameOverFlag.wait(timeout=1):
+            self.getMovement().move(gameboard)
+
 
 
 class Human(Blob):
@@ -111,24 +113,20 @@ class Human(Blob):
                                             InitialUserRadius.HUMAN))
         self.__id = ID
 
-    def start(self, gameboard):
+    def start(self, gameboard, gameOverFlag):
         """ Spin up a thread for moving """
         movementThread = threading.Thread(
                             target = self.moveAtInterval,
-                            args = [gameboard])
+                            args = [gameboard, gameOverFlag])
         movementThread.start()
 
         """ Any user requiring IO should run the IO in the main thread """
-        self.getDecision().waitForDecision(self.getMovement())
+        self.getDecision().waitForDecision(self.getMovement(), gameOverFlag)
 
 
-    def moveAtInterval(self, gameboard):
+    def moveAtInterval(self, gameboard, gameOverFlag):
         """ Move a Human player """
-
-        exit_flag = threading.Event()
-        while not exit_flag.wait(timeout=.01):
+        while not gameOverFlag.wait(timeout=.01):
             self.getMovement().move(gameboard)
             
-            gameboard.updateBackground()
-            self.draw()
-            gameboard.updateDisplay()
+

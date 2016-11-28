@@ -33,15 +33,21 @@ class Basic(object):
         """ No turn associated with that decision """
         return
 
-    def waitForDecision(self, currentPosition):
+    def waitForDecision(self, currentPosition, gameOverFlag):
         """ DEFAULT: Do nothing """
         return
+
+    def gameOver(self, gameOverFlag):
+        print("Game Over.")
+        gameOverFlag.set()
+        pygame.quit()
+        sys.exit()
 
 
 class Stationary(Basic):
     """ Decision class for a Stationary player """
 
-    def turn(self, currentPosition):
+    def turn(self, currentPosition, gameOverFlag):
         return
 
 
@@ -72,12 +78,15 @@ class KeyInput(Basic):
             }
         )
 
-    def waitForDecision(self, currentPosition):
+    def waitForDecision(self, currentPosition, gameOverFlag):
         clock = pygame.time.Clock()
         while 1:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
-                    self.turn(currentPosition, event.key)
+                    if event.key == pygame.K_q:
+                        self.gameOver(gameOverFlag)
+                    else:
+                        self.turn(currentPosition, event.key)
                 elif event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
@@ -110,12 +119,15 @@ class MouseInput(Basic):
             }
         )
 
-    def waitForDecision(self, currentPosition):
+    def waitForDecision(self, currentPosition, gameOverFlag):
         clock = pygame.time.Clock()
         while 1:
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEMOTION:
                     self.turn(currentPosition, event.pos)
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_q:
+                        self.gameOver(gameOverFlag)
                 elif event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()

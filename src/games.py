@@ -8,6 +8,9 @@
 #   List of game classes
 
 import pygame
+import threading
+from boards import SyncGameBoard
+from users import Food
 
 class Game(object):
     """A Game. Base class for all games.
@@ -17,50 +20,60 @@ class Game(object):
     """
 
     def __init__(   self,
-                    userList,
-                    boardType):
-        self.__users = userList
-        self.__board = boardType
+                    humanUser,
+                    initialFoodCount    = 4,
+                    initialAiCount      = 0,
+                    boardType = SyncGameBoard()):
+        self.__userList     = []
+        self.__gameboard    = boardType
+        self.__gameOverFlag = threading.Event()
 
+        self.createUsers(initialFoodCount, initialAiCount, humanUser)
+
+    def createUsers(self, foodCount, aiCount, human):
+        for f in range(1, foodCount):
+            self.__userList.append(
+                Food( (int(100*f), int(400/f)) ))
+
+        for a in range(1, aiCount):
+            print("add ai user")
+
+        ## Append human last so that when all users are started,
+        ## The call to start the human happens last. This is because
+        ## The human has their decision thread run in the main thread
+        ## So if you start it before the others, the infinite loop will
+        ## run and no other users will be created
+        self.__userList.append(human)
+
+    def isGameOver(self):
+        return self.__gameOverFlag
+
+    def initialize(self):
+        pygame.init()
+        self.__gameboard.initialize()
 
     def start(self):
-        pygame.init()
-        clock = pygame.time.Clock()
-        self.__board.initializeDisplay()
+        self.initialize()
+        self.DrawEveryNSeconds(.001)
 
         """ Start all players """
-        for p in self.__users:
-            p.start(self.__board)
+        for user in self.__userList:
+            user.start(self.__gameboard, self.__gameOverFlag)
 
-        """ Run main game loop """
-        while True:
-            handleEvents()
-            #drawGrid()
+    def DrawEveryNSeconds(self, nSeconds):
+        drawingThread = threading.Thread(
+                            target = self.drawAtInterval,
+                            args = [nSeconds])
+        drawingThread.start()
 
-            self.__board.updateDisplay()
-            clock.tick(30)
+    def drawAtInterval(self, interval):
+        while not self.__gameOverFlag.wait(timeout=interval):
+            self.draw()
 
-    def handleEvents():
-        # The only event we need to handle in this program is when it terminates.
-        global GAME_RUNNING
-
-        for event in pygame.event.get(): 
-            print(event)
-            #if  (event.type == QUIT) or 
-            #    (event.type == KEYDOWN and event.key == K_ESCAPE):
-            #        GAME_RUNNING = False #
-            #        pygame.quit()
-            #       sys.exit()
-
+    def draw(self):
+        self.__gameboard.updateBackground()
         
-
-    ##  Play all the musicians at the same time
-    ##def play(self, bpm):
-    #   threads = [threading.Thread(
-    #                target = self.conductMusician,
-    #                args = [musician, bpm])
-    #           for musician in self.musicians]
-    #   for t in threads:
-    #        t.start()
-    #   for t in threads:
-    #       t.join()
+        for user in self.__userList:
+            user.draw()
+        
+        self.__gameboard.updateDisplay()
