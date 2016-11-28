@@ -31,14 +31,8 @@ class Blob(object):
         self.__movement = movementClass
 
         self.__color    = Color.BLACK
-        self.__isAlive  = threading.Semaphore(1) ### Not used yet. @TODO
+        self.__isDead   = threading.Event() ### Not used yet. @TODO
         self.__lock     = threading.Lock()
-
-    def getSize(self):
-        return self.__movement.getSize()
-
-    def getPos(self):
-        return self.__movement.getPos()
 
     def getMovement(self):
         return self.__movement
@@ -49,9 +43,27 @@ class Blob(object):
     def draw(self):
         self.__movement.draw(self.__color)
 
-    def expose(self):
-        print("Size: %s \nPos: %s \nMovement: %s\n" % \
-         (self.getSize(), self.getPos(), self.getMovement()))
+    def isDead(self):
+        return self.__isDead
+
+    def quit(self):
+        self.__isDead.set()
+
+    def start(self, gameboard, gameOverFlag):
+        """ Spin up threads for making decisions and moving """
+        decisionThread = threading.Thread(
+                            target = self.__decision.waitForDecision,
+                            args = [self.__movement, gameOverFlag])
+        movementThread = threading.Thread(
+                            target = self.moveAtInterval,
+                            args = [gameboard])
+        decisionThread.start()
+        movementThread.start()
+
+    def moveAtInterval(self, gameboard):
+        """ Move a food item based on decision class """
+        while not self.isDead().wait(timeout=1):
+            self.__movement.move(gameboard)
 
 
 class Food(Blob):
@@ -72,24 +84,6 @@ class Food(Blob):
                         movementClass   = _Circle(
                                             initialCenter, 
                                             InitialUserRadius.FOOD))
-
-    def start(self, gameboard, gameOverFlag):
-        """ Spin up threads for making decisions and moving """
-        decisionThread = threading.Thread(
-                            target = self.getDecision().waitForDecision,
-                            args = [self.getMovement(), gameOverFlag])
-        movementThread = threading.Thread(
-                            target = self.moveAtInterval,
-                            args = [gameboard, gameOverFlag])
-        decisionThread.start()
-        movementThread.start()
-
-
-    def moveAtInterval(self, gameboard, gameOverFlag):
-        """ Move a food item based on decision class (Stationary) """
-        while not gameOverFlag.wait(timeout=1):
-            self.getMovement().move(gameboard)
-
 
 
 class Human(Blob):
@@ -117,16 +111,16 @@ class Human(Blob):
         """ Spin up a thread for moving """
         movementThread = threading.Thread(
                             target = self.moveAtInterval,
-                            args = [gameboard, gameOverFlag])
+                            args = [gameboard])
         movementThread.start()
 
         """ Any user requiring IO should run the IO in the main thread """
         self.getDecision().waitForDecision(self.getMovement(), gameOverFlag)
 
 
-    def moveAtInterval(self, gameboard, gameOverFlag):
+    def moveAtInterval(self, gameboard):
         """ Move a Human player """
-        while not gameOverFlag.wait(timeout=.01):
+        while not self.isDead().wait(timeout=.01):
             self.getMovement().move(gameboard)
             
 

@@ -3,7 +3,7 @@
 #   boards.py
 #
 #   Sam Heilbron
-#   Last Updated: November 12, 2016
+#   Last Updated: November 28, 2016
 #
 #   List of board classes
 
@@ -65,12 +65,10 @@ class SyncGameBoard(object):
         return self.__background
 
 
-    # Initialize the GameBoard with a value in each position
+    """@TODO: implememnt locking on board """
     def initGameBoard(self, val):
+        """ Init the board with a value in each position """
         return [[val for r in range(self.__width)] 
                     for c in range(self.__height)]
         
-    # Paint a color at a location, if that pixel has not been painted on yet
-    #def move(self, row, col, color):
-    #    with self.locks[row][col]:
-    #        #Do this
+

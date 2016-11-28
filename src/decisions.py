@@ -37,8 +37,7 @@ class Basic(object):
         """ DEFAULT: Do nothing """
         return
 
-    def gameOver(self, gameOverFlag):
-        print("Game Over.")
+    def quitGame(self, gameOverFlag):
         gameOverFlag.set()
         pygame.quit()
         sys.exit()
@@ -57,9 +56,6 @@ class KeyInput(Basic):
 
     Attributes:
         directions: Map of key inputs to methods
-
-    @TODO: Simply using getch.getch() blocks the other 
-        thread until a keyboard until a character is read.
     """
 
     def __init__(   self, 
@@ -84,12 +80,11 @@ class KeyInput(Basic):
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_q:
-                        self.gameOver(gameOverFlag)
+                        self.quitGame(gameOverFlag)
                     else:
                         self.turn(currentPosition, event.key)
                 elif event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
+                    self.quitGame(gameOverFlag)
             """ 20 frames per second """
             clock.tick(20)
                 
@@ -127,10 +122,9 @@ class MouseInput(Basic):
                     self.turn(currentPosition, event.pos)
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_q:
-                        self.gameOver(gameOverFlag)
+                        self.quitGame(gameOverFlag)
                 elif event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
+                    self.quitGame(gameOverFlag)
             """ 20 frames per second """
             clock.tick(20)       
 
@@ -148,7 +142,10 @@ class MouseInput(Basic):
 
 
 class AIInput(Basic):
-    """ Decision class for AI input (auto-move) """
+    """ Decision class for AI input (auto-move) 
+
+    @TODO: create decision algorithm for ai to move on its own
+    """
 
     def turn(self, currentPosition):
         print("ai move")

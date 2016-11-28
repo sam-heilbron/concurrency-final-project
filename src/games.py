@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-#   users.py
+#   games.py
 #
 #   Sam Heilbron
-#   Last Updated: November 25, 2016
+#   Last Updated: November 28, 2016
 #
 #   List of game classes
 
@@ -16,7 +16,9 @@ class Game(object):
     """A Game. Base class for all games.
 
     Attributes:
-
+        userList: the list of users participating
+        gameboard: the board that is being played on
+        gameOverFlag: a flag that is set when the game finishes
     """
 
     def __init__(   self,
@@ -38,15 +40,14 @@ class Game(object):
         for a in range(1, aiCount):
             print("add ai user")
 
-        ## Append human last so that when all users are started,
-        ## The call to start the human happens last. This is because
-        ## The human has their decision thread run in the main thread
-        ## So if you start it before the others, the infinite loop will
-        ## run and no other users will be created
+        """
+            Append human last so that when all users are started,
+        the call to start the human happens last. This is because
+        the human has their decision thread run in the main thread
+        so if you start it before the others, the infinite loop will
+        run and no other users will be created
+        """
         self.__userList.append(human)
-
-    def isGameOver(self):
-        return self.__gameOverFlag
 
     def initialize(self):
         pygame.init()
@@ -54,13 +55,34 @@ class Game(object):
 
     def start(self):
         self.initialize()
-        self.DrawEveryNSeconds(.001)
+        self.startGameOverListener()
+        self.startDrawing()
+        self.startUsers()
 
-        """ Start all players """
+    def startUsers(self):
         for user in self.__userList:
             user.start(self.__gameboard, self.__gameOverFlag)
 
-    def DrawEveryNSeconds(self, nSeconds):
+
+    def startGameOverListener(self):
+        gameListenerThread = threading.Thread(
+                                target = self.waitForGameOver,
+                                args = [])
+        gameListenerThread.start()
+
+    def waitForGameOver(self):
+        """ Wait for flag to be set, then trigger game over """
+        while not self.__gameOverFlag.wait(timeout=1.0):
+            pass
+        self.gameOver()
+
+    def gameOver(self):
+        print("Game over.")
+        for user in self.__userList:
+            user.quit()
+
+    def startDrawing(self, nSeconds = .001):
+        """ Spawn drawing in another thread """
         drawingThread = threading.Thread(
                             target = self.drawAtInterval,
                             args = [nSeconds])
