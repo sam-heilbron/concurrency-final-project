@@ -11,6 +11,7 @@ import pygame
 import threading
 from boards import SyncGameBoard
 from users import Food
+from random import randint
 
 class Game(object):
     """A Game. Base class for all games.
@@ -30,12 +31,15 @@ class Game(object):
         self.__gameboard    = boardType
         self.__gameOverFlag = threading.Event()
 
-        self.createUsers(initialFoodCount, initialAiCount, humanUser)
+        self.createUsers(   initialFoodCount, 
+                            initialAiCount, 
+                            humanUser)
 
     def createUsers(self, foodCount, aiCount, human):
+        maxWidth, maxHeight = self.__gameboard.getDimensions()
         for f in range(1, foodCount):
             self.__userList.append(
-                Food( (int(100*f), int(400/f)) ))
+                Food( (randint(0,maxWidth - 20), randint(0,maxHeight - 20)) ))
 
         for a in range(1, aiCount):
             print("add ai user")

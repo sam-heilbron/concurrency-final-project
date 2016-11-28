@@ -29,10 +29,8 @@ class Blob(object):
                     movementClass):
         self.__decision = decisionClass
         self.__movement = movementClass
-
         self.__color    = Color.BLACK
         self.__isDead   = threading.Event() ### Not used yet. @TODO
-        self.__lock     = threading.Lock()
 
     def getMovement(self):
         return self.__movement
@@ -62,7 +60,7 @@ class Blob(object):
 
     def moveAtInterval(self, gameboard):
         """ Move a food item based on decision class """
-        while not self.isDead().wait(timeout=1):
+        while not self.__isDead.wait(timeout=1):
             self.__movement.move(gameboard)
 
 
@@ -120,6 +118,7 @@ class Human(Blob):
 
     def moveAtInterval(self, gameboard):
         """ Move a Human player """
+        """ @TODO: make tiemout interval a variable """
         while not self.isDead().wait(timeout=.01):
             self.getMovement().move(gameboard)
             

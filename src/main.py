@@ -59,10 +59,10 @@ def getUserInput():
 
 def createAndStartGame(user):
 	""" Create a game and start playing """
-	
+
 	game = Game(
 			humanUser 			= user,
-			initialFoodCount 	= 4,
+			initialFoodCount 	= 20,
 			initialAiCount 		= 0)
 	game.start()
 
