@@ -3,7 +3,7 @@
 #   users.py
 #
 #   Sam Heilbron
-#   Last Updated: November 21, 2016
+#   Last Updated: November 30, 2016
 #
 #   List of user classes
 
@@ -48,6 +48,10 @@ class Blob(object):
         self.__isDead.set()
 
     def start(self, gameboard, gameOverFlag):
+        """ Acquire initial lock """
+        (col, row) = self.__movement.getCenter()
+        gameboard.getLocks()[row][col].acquire()
+
         """ Spin up threads for making decisions and moving """
         decisionThread = threading.Thread(
                             target = self.__decision.waitForDecision,
@@ -106,6 +110,10 @@ class Human(Blob):
                                             InitialUserRadius.HUMAN))
 
     def start(self, gameboard, gameOverFlag):
+        """ Acquire initial lock """
+        (col, row) = self.getMovement().getCenter()
+        gameboard.getLocks()[row][col].acquire()
+
         """ Spin up a thread for moving """
         movementThread = threading.Thread(
                             target = self.moveAtInterval,
