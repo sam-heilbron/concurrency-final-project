@@ -54,8 +54,8 @@ def getUserInput():
 	print("The game will begin shortly...\n")
 
 	if c == 'k':
-		return Human(1, (100,200), KeyInput())
-	return Human(1, (100,200), MouseInput())
+		return Human((100,200), KeyInput())
+	return Human((100,200), MouseInput())
 
 def createAndStartGame(user):
 	""" Create a game and start playing """

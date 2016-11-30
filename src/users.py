@@ -19,18 +19,18 @@ class Blob(object):
     Attributes:
         decision: The class defining IN WHICH DIRECTION a blob moves
         movement: The class defining HOW a blob moves
-
-        isAlive: Semaphore representing life of blob
-        lock: Mutex to force atomic access
+        color: The color of the blob (drawn on screen)
+        isDead: Semaphore representing life of blob
     """
 
     def __init__(   self,
+                    color,
                     decisionClass,
                     movementClass):
         self.__decision = decisionClass
         self.__movement = movementClass
-        self.__color    = Color.BLACK
-        self.__isDead   = threading.Event() ### Not used yet. @TODO
+        self.__color    = color
+        self.__isDead   = threading.Event()
 
     def getMovement(self):
         return self.__movement
@@ -78,6 +78,7 @@ class Food(Blob):
     def __init__(self, initialCenter):
         """ Create a Food item """
         Blob.__init__(  self, 
+                        color           = Color.BLACK,
                         decisionClass   = Stationary(),
                         movementClass   = _Circle(
                                             initialCenter, 
@@ -90,20 +91,19 @@ class Human(Blob):
     Attributes:
         decision: KeyInput class
         movement: Sphere class
-        id: The ID of the user
 
         isAlive: Semaphore representing life of blob
         lock: Mutex to force atomic access
     """
 
-    def __init__(self, ID, initialCenter, inputClass = KeyInput()):
+    def __init__(self, initialCenter, inputClass = KeyInput()):
         """ Create a Human player """
         Blob.__init__(  self, 
+                        color           = Color.RED,
                         decisionClass   = inputClass,
                         movementClass   = _Circle(
                                             initialCenter, 
                                             InitialUserRadius.HUMAN))
-        self.__id = ID
 
     def start(self, gameboard, gameOverFlag):
         """ Spin up a thread for moving """
@@ -113,7 +113,8 @@ class Human(Blob):
         movementThread.start()
 
         """ Any user requiring IO should run the IO in the main thread """
-        self.getDecision().waitForDecision(self.getMovement(), gameOverFlag)
+        self.getDecision().waitForDecision(
+                            self.getMovement(), gameOverFlag)
 
 
     def moveAtInterval(self, gameboard):
