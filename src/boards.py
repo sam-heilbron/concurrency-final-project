@@ -3,7 +3,7 @@
 #   boards.py
 #
 #   Sam Heilbron
-#   Last Updated: November 28, 2016
+#   Last Updated: November 30, 2016
 #
 #   List of board classes
 
@@ -16,7 +16,7 @@ class SyncGameBoard(object):
     def __init__(self, width = 800, height = 700):
         self.__width        = width
         self.__height       = height  
-        #self.__locks       = self.initGameBoard(threading.Lock())
+        self.__locks        = self.initGameBoard()
         self.__display      = None
         self.__background   = None
 
@@ -73,11 +73,14 @@ class SyncGameBoard(object):
     def getHeight(self):
         return self.__height
 
+    def getLocks(self):
+        return self.__locks
+
 
     """@TODO: implememnt locking on board """
-    def initGameBoard(self, val):
+    def initGameBoard(self):
         """ Init the board with a value in each position """
-        return [[val for r in range(self.__width)] 
+        return [[threading.Lock() for r in range(self.__width)] 
                     for c in range(self.__height)]
         
 

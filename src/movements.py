@@ -3,7 +3,7 @@
 #   movements.py
 #
 #   Sam Heilbron
-#   Last Updated: November 21, 2016
+#   Last Updated: November 30, 2016
 #
 #   List of movement classes
 
@@ -63,6 +63,7 @@ class _Circle(object):
 ##
     def move(self, gameboard):
         self.__directions[self.getCurrentDirection()](gameboard)
+        self.checkCollisions(gameboard)
 
     def draw(self, color):  
         pygame.draw.circle(
@@ -74,32 +75,65 @@ class _Circle(object):
     def goLeft(self, gameboard):
         """ Move left """
         (col, row) = self.__center
+        gameboard.getLocks()[row][col].release()
+
         if (col - (self.__radius + 1)) >= 0:
             self.__center = (col - 1, row)
+
+        (col, row) = self.__center
+        gameboard.getLocks()[row][col].acquire()
 
     def goRight(self, gameboard):
         """ Move right """
         boardWidth = gameboard.getWidth()
         (col, row) = self.__center
+        gameboard.getLocks()[row][col].release()
+
         if (col + (self.__radius + 1)) <= boardWidth:
             self.__center = (col + 1, row)
+
+        (col, row) = self.__center
+        gameboard.getLocks()[row][col].acquire()
 
     def goUp(self, gameboard):
         """ Move up """
         (col, row) = self.__center
+        gameboard.getLocks()[row][col].release()
+
         if (row - (self.__radius + 1)) >= 0:
             self.__center = (col, row - 1)
+
+        (col, row) = self.__center
+        gameboard.getLocks()[row][col].acquire()
 
     def goDown(self, gameboard):
         """ Move down """
         boardHeight = gameboard.getHeight()
         (col, row) = self.__center
+        gameboard.getLocks()[row][col].release()
+
         if (row + (self.__radius + 1)) <= boardHeight:
             self.__center = (col, row + 1)
+
+        (col, row) = self.__center
+        gameboard.getLocks()[row][col].acquire()
 
     def stayInPlace(self, gameboard):
         """ Stay in place """
         return
+
+    def checkCollisions(self, gameboard):
+        """ Go through all pixels in player's radius and check for a collision """
+        (centerCol, centerRow) = self.__center
+        (width, height) = gameboard.getDimensions()
+        for col in range(centerCol - self.__radius, centerCol + self.__radius):
+            if col < 0 or col > height:
+                continue
+            for row in range(centerRow - self.__radius, centerRow + self.__radius):
+                if row < 0 or row > width:
+                    continue
+                elif gameboard.getLocks()[row][col].locked() and (col, row) != self.__center:
+                    print "Collision occured at", col, row
 
 
 ###
