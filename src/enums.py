@@ -31,3 +31,8 @@ InitialUserRadius = enum(
 	AI		= 8,
 	HUMAN	= 10)
 
+
+# Frames per Second
+FPS = enum(
+	DECISION = 20)
+

@@ -9,7 +9,7 @@
 #
 
 from collections import defaultdict
-from enums import Direction
+from enums import Direction, FPS
 import pygame
 import sys
 
@@ -86,7 +86,7 @@ class KeyInput(Basic):
                 elif event.type == pygame.QUIT:
                     self.quitGame(gameOverFlag)
             """ 20 frames per second """
-            clock.tick(20)
+            clock.tick(FPS.DECISION)
                 
 
     def turn(self, currentPosition, keyPressed):
@@ -126,17 +126,20 @@ class MouseInput(Basic):
                 elif event.type == pygame.QUIT:
                     self.quitGame(gameOverFlag)
             """ 20 frames per second """
-            clock.tick(20)       
+            clock.tick(FPS.DECISION)       
 
     def turn(self, currentPosition, mousePosition):
         (col, row) = currentPosition.getCenter()
         (mouseCol, mouseRow) = mousePosition
 
-        colLarger = (abs(mouseCol - col)) > (abs(mouseRow - row))
-        if colLarger:
-            return self.__directions[(1, mouseCol - col > 0)](currentPosition)
+        colDifference = mouseCol - col
+        rowDifference = mouseRow - row
 
-        return self.__directions[(0, mouseRow - row > 0)](currentPosition)
+        colDifferenceLarger = (abs(colDifference)) > (abs(rowDifference))
+        if colDifferenceLarger:
+            return self.__directions[(1, colDifference > 0)](currentPosition)
+
+        return self.__directions[(0, rowDifference > 0)](currentPosition)
 
 
 

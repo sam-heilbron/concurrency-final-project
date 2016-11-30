@@ -67,6 +67,12 @@ class SyncGameBoard(object):
     def getDimensions(self):
         return self.__width, self.__height
 
+    def getWidth(self):
+        return self.__width
+
+    def getHeight(self):
+        return self.__height
+
 
     """@TODO: implememnt locking on board """
     def initGameBoard(self, val):

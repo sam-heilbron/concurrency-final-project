@@ -76,26 +76,26 @@ class _Circle(object):
         (col, row) = self.__center
         if (col - (self.__radius + 1)) >= 0:
             self.__center = (col - 1, row)
-        else:
-            self.__center = (col, row)
 
     def goRight(self, gameboard):
         """ Move right """
+        boardWidth = gameboard.getWidth()
         (col, row) = self.__center
-        self.__center = (col + 1, row)
+        if (col + (self.__radius + 1)) <= boardWidth:
+            self.__center = (col + 1, row)
 
     def goUp(self, gameboard):
         """ Move up """
         (col, row) = self.__center
         if (row - (self.__radius + 1)) >= 0:
             self.__center = (col, row - 1)
-        else:
-            self.__center = (col, row)
 
     def goDown(self, gameboard):
         """ Move down """
+        boardHeight = gameboard.getHeight()
         (col, row) = self.__center
-        self.__center = (col, row + 1)
+        if (row + (self.__radius + 1)) <= boardHeight:
+            self.__center = (col, row + 1)
 
     def stayInPlace(self, gameboard):
         """ Stay in place """
