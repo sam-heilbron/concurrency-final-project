@@ -61,9 +61,11 @@ class _Circle(object):
 ##  Shouldn't be able to move if ANY of the pixels will go 
 ##  less than 0 or greater than max
 ##
-    def move(self, gameboard):
-        self.__directions[self.getCurrentDirection()](gameboard)
-        self.checkCollisions(gameboard)
+
+## set the isDeadFlag when you want to kill a user
+    def move(self, game):
+        self.__directions[self.getCurrentDirection()](game.getGameboard())
+        self.checkCollisions(game)
 
     def draw(self, color):  
         pygame.draw.circle(
@@ -75,55 +77,54 @@ class _Circle(object):
     def goLeft(self, gameboard):
         """ Move left """
         (col, row) = self.__center
-        gameboard.getLocks()[row][col].release()
 
         if (col - (self.__radius + 1)) >= 0:
+            gameboard.getLockAtCenter(self.__center).release()
             self.__center = (col - 1, row)
-
-        (col, row) = self.__center
-        gameboard.getLocks()[row][col].acquire()
+            gameboard.getLockAtCenter(self.__center).acquire()
 
     def goRight(self, gameboard):
         """ Move right """
         boardWidth = gameboard.getWidth()
         (col, row) = self.__center
-        gameboard.getLocks()[row][col].release()
 
         if (col + (self.__radius + 1)) <= boardWidth:
+            gameboard.getLockAtCenter(self.__center).release()
             self.__center = (col + 1, row)
-
-        (col, row) = self.__center
-        gameboard.getLocks()[row][col].acquire()
+            gameboard.getLockAtCenter(self.__center).acquire()
 
     def goUp(self, gameboard):
         """ Move up """
         (col, row) = self.__center
-        gameboard.getLocks()[row][col].release()
 
         if (row - (self.__radius + 1)) >= 0:
+            gameboard.getLockAtCenter(self.__center).release()
             self.__center = (col, row - 1)
-
-        (col, row) = self.__center
-        gameboard.getLocks()[row][col].acquire()
+            gameboard.getLockAtCenter(self.__center).acquire()
 
     def goDown(self, gameboard):
         """ Move down """
         boardHeight = gameboard.getHeight()
         (col, row) = self.__center
-        gameboard.getLocks()[row][col].release()
 
         if (row + (self.__radius + 1)) <= boardHeight:
+            gameboard.getLockAtCenter(self.__center).release()
             self.__center = (col, row + 1)
-
-        (col, row) = self.__center
-        gameboard.getLocks()[row][col].acquire()
+            gameboard.getLockAtCenter(self.__center).acquire()
 
     def stayInPlace(self, gameboard):
         """ Stay in place """
         return
 
-    def checkCollisions(self, gameboard):
+##
+## We can change this to check only BORDER elements
+## This is because a piece only moves 1 space (no matter how quickly)
+## So it can only change a few positions
+## iF each user checks then we don't have to worry about faster users
+##  moving multiple times for each move by a slower user
+    def checkCollisions(self, game):
         """ Go through all pixels in player's radius and check for a collision """
+        gameboard = game.getGameboard()
         (centerCol, centerRow) = self.__center
         (width, height) = gameboard.getDimensions()
         for col in range(centerCol - self.__radius, centerCol + self.__radius):
@@ -132,8 +133,14 @@ class _Circle(object):
             for row in range(centerRow - self.__radius, centerRow + self.__radius):
                 if row < 0 or row > width:
                     continue
-                elif gameboard.getLocks()[row][col].locked() and (col, row) != self.__center:
-                    print "Collision occured at", col, row
+                elif gameboard.getLockAtCenter((col,row)).locked() and (col, row) != self.__center:
+                    print("Collision occured at (%s, %s)" % (col, row))
+                    """ 
+                    Here were would kill a user BUT we need some way of figuring out the
+                    userID of the user holding the lock
+                    """
+                    game.killUserWithID("food_1")
+                    return
 
 
 ###

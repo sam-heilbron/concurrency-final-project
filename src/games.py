@@ -26,23 +26,24 @@ class Game(object):
                     humanUser,
                     initialFoodCount    = 4,
                     initialAiCount      = 0,
-                    boardType = SyncGameBoard()):
+                    boardType           = SyncGameBoard()):
         self.__userList     = []
         self.__gameboard    = boardType
         self.__gameOverFlag = threading.Event()
 
-        self.createUsers(   initialFoodCount, 
-                            initialAiCount, 
-                            humanUser)
+        self.createUsers(initialFoodCount, initialAiCount, humanUser)
 
     def createUsers(self, foodCount, aiCount, human):
         maxWidth, maxHeight = self.__gameboard.getDimensions()
-        for f in range(1, foodCount):
+        for f in range(1, foodCount + 1):
             self.__userList.append(
-                Food( (randint(0,maxWidth - 20), randint(0,maxHeight - 20)) ))
+                Food( 
+                    id_ = "food_" + str(f),
+                    initialCenter = (randint(0,maxWidth - 20), 
+                                     randint(0,maxHeight - 20))))
 
-        for a in range(1, aiCount):
-            print("add ai user")
+        ##for a in range(1, aiCount):
+        ##    print("add ai user")
 
         """
             Append human last so that when all users are started,
@@ -53,20 +54,24 @@ class Game(object):
         """
         self.__userList.append(human)
 
-    def initialize(self):
+    def getGameboard(self):
+        return self.__gameboard
+
+    def getGameOverFlag(self):
+        return self.__gameOverFlag
+
+    def start(self):
         pygame.init()
         self.__gameboard.initialize()
 
-    def start(self):
-        self.initialize()
         self.startGameOverListener()
         self.startDrawing()
         self.startUsers()
 
+
     def startUsers(self):
         for user in self.__userList:
-            user.start(self.__gameboard, self.__gameOverFlag)
-
+            user.start(self)
 
     def startGameOverListener(self):
         gameListenerThread = threading.Thread(
@@ -76,23 +81,32 @@ class Game(object):
 
     def waitForGameOver(self):
         """ Wait for flag to be set, then trigger game over """
-        while not self.__gameOverFlag.wait(timeout=1.0):
-            pass
+        self.__gameOverFlag.wait()
         self.gameOver()
 
     def gameOver(self):
-        print("Game over.")
+        print("Trigger Game over.")
         for user in self.__userList:
             user.quit()
 
-    def startDrawing(self, nSeconds = .001):
+    def killUserWithID(self, userID):
+        try:
+            u = next(user for user in self.__userList if user.getID() == userID)
+            u.quit()
+            self.__userList.remove(u)
+        except StopIteration:
+            """ userID not in game currently """
+            pass
+        
+
+    def startDrawing(self):
         """ Spawn drawing in another thread """
         drawingThread = threading.Thread(
                             target = self.drawAtInterval,
-                            args = [nSeconds])
+                            args = [])
         drawingThread.start()
 
-    def drawAtInterval(self, interval):
+    def drawAtInterval(self, interval = .001):
         while not self.__gameOverFlag.wait(timeout=interval):
             self.draw()
 

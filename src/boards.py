@@ -76,8 +76,10 @@ class SyncGameBoard(object):
     def getLocks(self):
         return self.__locks
 
+    def getLockAtCenter(self, centerPostion):
+        (col, row) = centerPostion
+        return self.__locks[row][col]
 
-    """@TODO: implememnt locking on board """
     def initGameBoard(self):
         """ Init the board with a value in each position """
         return [[threading.Lock() for r in range(self.__width)] 

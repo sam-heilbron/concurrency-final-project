@@ -24,11 +24,13 @@ class Blob(object):
     """
 
     def __init__(   self,
+                    id_,
                     color,
                     decisionClass,
                     movementClass):
         self.__decision = decisionClass
         self.__movement = movementClass
+        self.__id       = id_
         self.__color    = color
         self.__isDead   = threading.Event()
 
@@ -41,31 +43,36 @@ class Blob(object):
     def draw(self):
         self.__movement.draw(self.__color)
 
+    def getID(self):
+        return self.__id
+
     def isDead(self):
         return self.__isDead
 
     def quit(self):
+        print("Prepare to kill user: %s" % self.__id)
         self.__isDead.set()
 
-    def start(self, gameboard, gameOverFlag):
+    def start(self, game):
         """ Acquire initial lock """
-        (col, row) = self.__movement.getCenter()
-        gameboard.getLocks()[row][col].acquire()
+        game.getGameboard().getLockAtCenter(
+            self.__movement.getCenter()).acquire()
 
         """ Spin up threads for making decisions and moving """
         decisionThread = threading.Thread(
                             target = self.__decision.waitForDecision,
-                            args = [self.__movement, gameOverFlag])
+                            args = [self, game.getGameOverFlag()])
         movementThread = threading.Thread(
                             target = self.moveAtInterval,
-                            args = [gameboard])
+                            args = [game])
         decisionThread.start()
         movementThread.start()
 
-    def moveAtInterval(self, gameboard):
+    def moveAtInterval(self, game):
         """ Move a food item based on decision class """
         while not self.__isDead.wait(timeout=1):
-            self.__movement.move(gameboard)
+            self.__movement.move(game)
+
 
 
 class Food(Blob):
@@ -79,9 +86,10 @@ class Food(Blob):
         lock: Mutex to force atomic access
     """
 
-    def __init__(self, initialCenter):
+    def __init__(self, id_, initialCenter):
         """ Create a Food item """
         Blob.__init__(  self, 
+                        id_             = id_,
                         color           = Color.BLACK,
                         decisionClass   = Stationary(),
                         movementClass   = _Circle(
@@ -100,35 +108,34 @@ class Human(Blob):
         lock: Mutex to force atomic access
     """
 
-    def __init__(self, initialCenter, inputClass = KeyInput()):
+    def __init__(self, initialCenter, decisionClass = KeyInput()):
         """ Create a Human player """
         Blob.__init__(  self, 
+                        id_             = "human",
                         color           = Color.RED,
-                        decisionClass   = inputClass,
+                        decisionClass   = decisionClass,
                         movementClass   = _Circle(
                                             initialCenter, 
                                             InitialUserRadius.HUMAN))
 
-    def start(self, gameboard, gameOverFlag):
+    def start(self, game):
         """ Acquire initial lock """
-        (col, row) = self.getMovement().getCenter()
-        gameboard.getLocks()[row][col].acquire()
+        game.getGameboard().getLockAtCenter(
+            self.getMovement().getCenter()).acquire()
 
         """ Spin up a thread for moving """
         movementThread = threading.Thread(
                             target = self.moveAtInterval,
-                            args = [gameboard])
+                            args = [game])
         movementThread.start()
 
         """ Any user requiring IO should run the IO in the main thread """
         self.getDecision().waitForDecision(
-                            self.getMovement(), gameOverFlag)
+                            self, game.getGameOverFlag())
 
 
-    def moveAtInterval(self, gameboard):
+    def moveAtInterval(self, game):
         """ Move a Human player """
-        """ @TODO: make tiemout interval a variable """
+        """ @TODO: make timeout interval a variable """
         while not self.isDead().wait(timeout=.01):
-            self.getMovement().move(gameboard)
-            
-
+            self.getMovement().move(game)

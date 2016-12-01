@@ -17,25 +17,29 @@ import sys
 class Basic(object):
     """ Base class for all decision classes """
 
-    def turnLeft(self, currentPosition):
-        currentPosition.setCurrentDirection(Direction.LEFT)
+    def turnLeft(self, movement):
+        movement.setCurrentDirection(Direction.LEFT)
 
-    def turnRight(self, currentPosition):
-        currentPosition.setCurrentDirection(Direction.RIGHT)
+    def turnRight(self, movement):
+        movement.setCurrentDirection(Direction.RIGHT)
 
-    def turnUp(self, currentPosition):
-        currentPosition.setCurrentDirection(Direction.UP)
+    def turnUp(self, movement):
+        movement.setCurrentDirection(Direction.UP)
 
-    def turnDown(self, currentPosition):
-        currentPosition.setCurrentDirection(Direction.DOWN)
+    def turnDown(self, movement):
+        movement.setCurrentDirection(Direction.DOWN)
 
-    def noTurn(self, currentPosition):
+    def noTurn(self, movement):
         """ No turn associated with that decision """
         return
 
-    def waitForDecision(self, currentPosition, gameOverFlag):
-        """ DEFAULT: Do nothing """
-        return
+        ## Theoretically you could just return, but it's more realistic to 
+        ## have a thread alive as long as the user is alive
+    def waitForDecision(self, user, gameOverFlag):
+        """ DEFAULT: Loop on nothing """
+        clock = pygame.time.Clock()
+        while not user.isDead():
+            clock.tick(FPS.DECISION)
 
     def quitGame(self, gameOverFlag):
         gameOverFlag.set()
@@ -74,7 +78,7 @@ class KeyInput(Basic):
             }
         )
 
-    def waitForDecision(self, currentPosition, gameOverFlag):
+    def waitForDecision(self, user, gameOverFlag):
         clock = pygame.time.Clock()
         while 1:
             for event in pygame.event.get():
@@ -82,15 +86,14 @@ class KeyInput(Basic):
                     if event.key == pygame.K_q:
                         self.quitGame(gameOverFlag)
                     else:
-                        self.turn(currentPosition, event.key)
+                        self.turn(user.getMovement(), event.key)
                 elif event.type == pygame.QUIT:
                     self.quitGame(gameOverFlag)
             """ 20 frames per second """
-            clock.tick(FPS.DECISION)
-                
+            clock.tick(FPS.DECISION)      
 
-    def turn(self, currentPosition, keyPressed):
-        return self.__directions[keyPressed](currentPosition)
+    def turn(self, movement, keyPressed):
+        return self.__directions[keyPressed](movement)
 
 
 class MouseInput(Basic):
@@ -114,22 +117,25 @@ class MouseInput(Basic):
             }
         )
 
-    def waitForDecision(self, currentPosition, gameOverFlag):
+        ## would like to switch while 1 --> while not user.isDead() 
+        ##but cuasing issues
+    def waitForDecision(self, user, gameOverFlag):
         clock = pygame.time.Clock()
         while 1:
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEMOTION:
-                    self.turn(currentPosition, event.pos)
+                    self.turn(user.getMovement(), event.pos)
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_q:
                         self.quitGame(gameOverFlag)
                 elif event.type == pygame.QUIT:
                     self.quitGame(gameOverFlag)
             """ 20 frames per second """
-            clock.tick(FPS.DECISION)       
+            clock.tick(FPS.DECISION)
+     
 
-    def turn(self, currentPosition, mousePosition):
-        (col, row) = currentPosition.getCenter()
+    def turn(self, movement, mousePosition):
+        (col, row) = movement.getCenter()
         (mouseCol, mouseRow) = mousePosition
 
         colDifference = mouseCol - col
@@ -137,9 +143,9 @@ class MouseInput(Basic):
 
         colDifferenceLarger = (abs(colDifference)) > (abs(rowDifference))
         if colDifferenceLarger:
-            return self.__directions[(1, colDifference > 0)](currentPosition)
+            return self.__directions[(1, colDifference > 0)](movement)
 
-        return self.__directions[(0, rowDifference > 0)](currentPosition)
+        return self.__directions[(0, rowDifference > 0)](movement)
 
 
 
@@ -150,5 +156,5 @@ class AIInput(Basic):
     @TODO: create decision algorithm for ai to move on its own
     """
 
-    def turn(self, currentPosition):
+    def turn(self, movement):
         print("ai move")
