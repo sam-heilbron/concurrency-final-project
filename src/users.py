@@ -54,9 +54,10 @@ class Blob(object):
         self.__isDead.set()
 
     def start(self, game):
-        """ Acquire initial lock """
-        game.getGameboard().getLockAtCenter(
-            self.__movement.getCenter()).acquire()
+        """ Acquire initial lock and set initial player position """
+        (col, row) = self.__movement.getCenter()
+        game.getGameboard().getLockAtCenter((col, row)).acquire()
+        game.getGameboard().getPlayers()[row][col] = self.__id 
 
         """ Spin up threads for making decisions and moving """
         decisionThread = threading.Thread(
@@ -119,9 +120,10 @@ class Human(Blob):
                                             InitialUserRadius.HUMAN))
 
     def start(self, game):
-        """ Acquire initial lock """
-        game.getGameboard().getLockAtCenter(
-            self.getMovement().getCenter()).acquire()
+        """ Acquire initial lock and set initial player position """
+        (col, row) = self.getMovement().getCenter()
+        game.getGameboard().getLockAtCenter((col, row)).acquire()
+        game.getGameboard().getPlayers()[row][col] = self.getID() 
 
         """ Spin up a thread for moving """
         movementThread = threading.Thread(

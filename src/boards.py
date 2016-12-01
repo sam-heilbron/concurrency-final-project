@@ -16,7 +16,8 @@ class SyncGameBoard(object):
     def __init__(self, width = 800, height = 700):
         self.__width        = width
         self.__height       = height  
-        self.__locks        = self.initGameBoard()
+        self.__locks        = self.initGameBoardLocks()
+        self.__players      = self.initGameBoardPlayers() 
         self.__display      = None
         self.__background   = None
 
@@ -76,13 +77,25 @@ class SyncGameBoard(object):
     def getLocks(self):
         return self.__locks
 
-    def getLockAtCenter(self, centerPostion):
-        (col, row) = centerPostion
+    def getPlayers(self):
+        return self.__players
+
+    def getLockAtCenter(self, centerPosition):
+        (col, row) = centerPosition
         return self.__locks[row][col]
 
-    def initGameBoard(self):
+    def getPlayerAtPosition(self, centerPosition):
+        (col, row) = centerPosition
+        return self.__players[row][col]
+
+    def initGameBoardLocks(self):
         """ Init the board with a value in each position """
         return [[threading.Lock() for r in range(self.__width)] 
                     for c in range(self.__height)]
         
+    def initGameBoardPlayers(self):
+        """ This board holds players at their positions.
+            Board is initialized to None. """
+        return [[None for r in range(self.__width)] 
+                    for c in range(self.__height)]
 

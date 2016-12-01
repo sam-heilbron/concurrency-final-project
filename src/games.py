@@ -3,7 +3,7 @@
 #   games.py
 #
 #   Sam Heilbron
-#   Last Updated: November 28, 2016
+#   Last Updated: November 30, 2016
 #
 #   List of game classes
 
@@ -98,6 +98,14 @@ class Game(object):
             """ userID not in game currently """
             pass
         
+    def getUserFromID(self, userID):
+        try:
+            u = next(user for user in self.__userList if user.getID() == userID)
+            return u
+        except StopIteration:
+            """ userID not in game currently """
+            pass
+
 
     def startDrawing(self):
         """ Spawn drawing in another thread """

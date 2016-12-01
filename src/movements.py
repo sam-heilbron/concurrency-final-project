@@ -139,8 +139,19 @@ class _Circle(object):
                     Here were would kill a user BUT we need some way of figuring out the
                     userID of the user holding the lock
                     """
-                    game.killUserWithID("food_1")
+                    blobID = gameboard.getPlayerAtPosition((col, row))
+                    self.handleCollisions(game, blobID)
                     return
+
+    def handleCollisions(self, game, blobID):
+        """ Kill the blob and increase the size of the player """
+        """ TODO: probably need to add logic to handle different sized
+            users (if a small users collides into a larger user, the larger 
+            should still eat the smaller)"""
+        blob = game.getUserFromID(blobID)
+        game.getGameboard().getLockAtCenter(blob.getMovement().__center).release()
+        game.killUserWithID(blobID) 
+        self.__radius = self.__radius + blob.getMovement().__radius
 
 
 ###
