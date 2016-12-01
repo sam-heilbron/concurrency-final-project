@@ -11,12 +11,15 @@ from enums import Direction, Color
 import threading
 import pygame
 
-class _Circle(object):
-    """A Circle. Class for circle positions.
+class Circle_(object):
+    """A Circle. Class circular blobs.
 
     Attributes:
-        pixels: List of pixel coordinates.
-        size: The size of the sphere.
+        center: The center of the circle.
+        radius: The radius of the circle.
+        direction: The current direction of the circle
+        directionMutex: Controls atomic access to direction variable
+        directions: Map of directions to movement methods
     """
 
     def __init__(self, initialCenter, initialRadius = 1):
@@ -27,11 +30,11 @@ class _Circle(object):
 
         self.__directions       = dict(
             {
-                Direction.LEFT  : self.goLeft,
-                Direction.RIGHT : self.goRight,
-                Direction.UP    : self.goUp,
-                Direction.DOWN  : self.goDown,
-                Direction.STAY  : self.stayInPlace
+                Direction.LEFT  : self._goLeft,
+                Direction.RIGHT : self._goRight,
+                Direction.UP    : self._goUp,
+                Direction.DOWN  : self._goDown,
+                Direction.STAY  : self._stayInPlace
             })
 
 
@@ -55,17 +58,9 @@ class _Circle(object):
         with self.__directionMutex:
             self.__direction = direction
 
-
-##
-##  Change how the movemnt is handled
-##  Shouldn't be able to move if ANY of the pixels will go 
-##  less than 0 or greater than max
-##
-
-## set the isDeadFlag when you want to kill a user
     def move(self, game):
         self.__directions[self.getCurrentDirection()](game.getGameboard())
-        self.checkCollisions(game)
+        self._checkCollisions(game)
 
     def draw(self, color):  
         pygame.draw.circle(
@@ -74,7 +69,9 @@ class _Circle(object):
             self.__center, 
             self.__radius)
 
-    def goLeft(self, gameboard):
+    #########################   PROTECTED   #########################
+
+    def _goLeft(self, gameboard):
         """ Move left """
         (col, row) = self.__center
 
@@ -83,7 +80,7 @@ class _Circle(object):
             self.__center = (col - 1, row)
             gameboard.getLockAtCenter(self.__center).acquire()
 
-    def goRight(self, gameboard):
+    def _goRight(self, gameboard):
         """ Move right """
         boardWidth = gameboard.getWidth()
         (col, row) = self.__center
@@ -93,7 +90,7 @@ class _Circle(object):
             self.__center = (col + 1, row)
             gameboard.getLockAtCenter(self.__center).acquire()
 
-    def goUp(self, gameboard):
+    def _goUp(self, gameboard):
         """ Move up """
         (col, row) = self.__center
 
@@ -102,7 +99,7 @@ class _Circle(object):
             self.__center = (col, row - 1)
             gameboard.getLockAtCenter(self.__center).acquire()
 
-    def goDown(self, gameboard):
+    def _goDown(self, gameboard):
         """ Move down """
         boardHeight = gameboard.getHeight()
         (col, row) = self.__center
@@ -112,7 +109,7 @@ class _Circle(object):
             self.__center = (col, row + 1)
             gameboard.getLockAtCenter(self.__center).acquire()
 
-    def stayInPlace(self, gameboard):
+    def _stayInPlace(self, gameboard):
         """ Stay in place """
         return
 
@@ -122,7 +119,7 @@ class _Circle(object):
 ## So it can only change a few positions
 ## iF each user checks then we don't have to worry about faster users
 ##  moving multiple times for each move by a slower user
-    def checkCollisions(self, game):
+    def _checkCollisions(self, game):
         """ Go through all pixels in player's radius and check for a collision """
         gameboard = game.getGameboard()
         (centerCol, centerRow) = self.__center
@@ -140,10 +137,10 @@ class _Circle(object):
                     userID of the user holding the lock
                     """
                     blobID = gameboard.getPlayerAtPosition((col, row))
-                    self.handleCollisions(game, blobID)
+                    self._handleCollisions(game, blobID)
                     return
 
-    def handleCollisions(self, game, blobID):
+    def _handleCollisions(self, game, blobID):
         """ Kill the blob and increase the size of the player """
         """ TODO: probably need to add logic to handle different sized
             users (if a small users collides into a larger user, the larger 
@@ -152,10 +149,3 @@ class _Circle(object):
         game.getGameboard().getLockAtCenter(blob.getMovement().__center).release()
         game.killUserWithID(blobID) 
         self.__radius = self.__radius + blob.getMovement().__radius
-
-
-###
-###self.__pixels =[(max(0,row-1),col) for (row,col) in self.__pixels]
-###
-
-

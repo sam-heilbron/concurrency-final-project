@@ -39,8 +39,8 @@ class Game(object):
             self.__userList.append(
                 Food( 
                     id_ = "food_" + str(f),
-                    initialCenter = (randint(0,maxWidth - 20), 
-                                     randint(0,maxHeight - 20))))
+                    initialCenter = (randint(20, maxWidth - 20), 
+                                     randint(20, maxHeight - 20))))
 
         ##for a in range(1, aiCount):
         ##    print("add ai user")
@@ -54,40 +54,23 @@ class Game(object):
         """
         self.__userList.append(human)
 
+    ##########################   GETTERS   ##########################
+
     def getGameboard(self):
         return self.__gameboard
 
     def getGameOverFlag(self):
         return self.__gameOverFlag
 
-    def start(self):
-        pygame.init()
-        self.__gameboard.initialize()
+    def getUserFromID(self, userID):
+        try:
+            u = next(user for user in self.__userList if user.getID() == userID)
+            return u
+        except StopIteration:
+            """ userID not in game currently """
+            pass
 
-        self.startGameOverListener()
-        self.startDrawing()
-        self.startUsers()
-
-
-    def startUsers(self):
-        for user in self.__userList:
-            user.start(self)
-
-    def startGameOverListener(self):
-        gameListenerThread = threading.Thread(
-                                target = self.waitForGameOver,
-                                args = [])
-        gameListenerThread.start()
-
-    def waitForGameOver(self):
-        """ Wait for flag to be set, then trigger game over """
-        self.__gameOverFlag.wait()
-        self.gameOver()
-
-    def gameOver(self):
-        print("Trigger Game over.")
-        for user in self.__userList:
-            user.quit()
+    ##########################   SETTERS   ##########################
 
     def killUserWithID(self, userID):
         try:
@@ -97,28 +80,61 @@ class Game(object):
         except StopIteration:
             """ userID not in game currently """
             pass
-        
-    def getUserFromID(self, userID):
-        try:
-            u = next(user for user in self.__userList if user.getID() == userID)
-            return u
-        except StopIteration:
-            """ userID not in game currently """
-            pass
+
+    ########################   START GAME   #########################
+
+    def start(self):
+        pygame.init()
+        self.__gameboard.initialize()
+
+        self._startGameOverListener()
+        self._startDrawing()
+        self._startUsers()
+
+    def _startUsers(self):
+        for user in self.__userList:
+            self._placeUserOnBoard(user)
+            user.start(self)
+
+    def _placeUserOnBoard(self, user):
+        userCenter = user.getCenter()
+        gameboard = self.getGameboard()
+        gameboard.getLockAtCenter(userCenter).acquire()
+        gameboard.setPlayerAtPosition(userCenter, user.getID())
 
 
-    def startDrawing(self):
+    #########################   END GAME   ##########################
+
+    def _startGameOverListener(self):
+        gameListenerThread = threading.Thread(
+                                target = self._waitForGameOver,
+                                args = [])
+        gameListenerThread.start()
+
+    def _waitForGameOver(self):
+        """ Wait for flag to be set, then trigger game over """
+        self.__gameOverFlag.wait()
+        self._gameOver()
+
+    def _gameOver(self):
+        print("Trigger Game over.")
+        for user in self.__userList:
+            user.quit()
+
+    ########################   DRAW BOARD   #########################
+
+    def _startDrawing(self):
         """ Spawn drawing in another thread """
         drawingThread = threading.Thread(
-                            target = self.drawAtInterval,
+                            target = self._drawAtInterval,
                             args = [])
         drawingThread.start()
 
-    def drawAtInterval(self, interval = .001):
+    def _drawAtInterval(self, interval = .001):
         while not self.__gameOverFlag.wait(timeout=interval):
-            self.draw()
+            self._draw()
 
-    def draw(self):
+    def _draw(self):
         self.__gameboard.updateBackground()
         
         for user in self.__userList:

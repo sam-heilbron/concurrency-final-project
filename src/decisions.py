@@ -13,7 +13,11 @@ from enums import Direction, FPS
 import pygame
 import sys
 
-
+###############################################################################
+##
+##                              Basic class
+##
+###############################################################################
 class Basic(object):
     """ Base class for all decision classes """
 
@@ -33,28 +37,34 @@ class Basic(object):
         """ No turn associated with that decision """
         return
 
-        ## Theoretically you could just return, but it's more realistic to 
-        ## have a thread alive as long as the user is alive
-    def waitForDecision(self, user, gameOverFlag):
-        """ DEFAULT: Loop on nothing """
-        clock = pygame.time.Clock()
-        while not user.isDead():
-            clock.tick(FPS.DECISION)
-
     def quitGame(self, gameOverFlag):
         gameOverFlag.set()
         pygame.quit()
         sys.exit()
 
 
+###############################################################################
+##
+##                              Stationary class
+##
+###############################################################################
 class Stationary(Basic):
     """ Decision class for a Stationary player """
 
-    def turn(self, currentPosition, gameOverFlag):
-        return
+    ## Theoretically you could just return, but it's more realistic to 
+    ## have a thread alive as long as the user is alive
+    def waitForDecision(self, user, gameOverFlag):
+        """ DEFAULT: Loop on nothing """
+        clock = pygame.time.Clock()
+        while not user.isDead():
+            clock.tick(FPS.DECISION)
 
 
-
+###############################################################################
+##
+##                              KeyInput class
+##
+###############################################################################
 class KeyInput(Basic):
     """ Decision class for keyboard inputs
 
@@ -96,6 +106,11 @@ class KeyInput(Basic):
         return self.__directions[keyPressed](movement)
 
 
+###############################################################################
+##
+##                              MouseInput class
+##
+###############################################################################
 class MouseInput(Basic):
     """ Decision class for mouse input
 
@@ -117,9 +132,10 @@ class MouseInput(Basic):
             }
         )
 
-        ## would like to switch while 1 --> while not user.isDead() 
-        ##but cuasing issues
     def waitForDecision(self, user, gameOverFlag):
+        """ @TODO: would like to switch while 1 --> while not user.isDead ()
+            but that was causing issues. will look into
+        """
         clock = pygame.time.Clock()
         while 1:
             for event in pygame.event.get():
@@ -148,8 +164,11 @@ class MouseInput(Basic):
         return self.__directions[(0, rowDifference > 0)](movement)
 
 
-
-
+###############################################################################
+##
+##                              AIInput class
+##
+###############################################################################
 class AIInput(Basic):
     """ Decision class for AI input (auto-move) 
 

@@ -18,7 +18,6 @@ Direction = enum(
     RIGHT   = 4,
     STAY    = 5)
 
-
 Color = enum(
 	BLACK 	= (0, 0, 0),
 	WHITE 	= (255, 255, 255),
@@ -31,8 +30,6 @@ InitialUserRadius = enum(
 	AI		= 8,
 	HUMAN	= 10)
 
-
 # Frames per Second
 FPS = enum(
 	DECISION = 20)
-
