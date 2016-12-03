@@ -8,9 +8,9 @@
 #   List of user classes
 
 import threading
-from decisions import Stationary, KeyInput
+from decisions import Stationary, KeyInput, AIInput
 from movements import Circle_
-from enums import InitialUserRadius, Color
+from enums import InitialUserRadius, Color, Timeout
 
 ###############################################################################
 ##
@@ -56,6 +56,9 @@ class Blob(object):
     def getCenter(self):
         return self.__movement.getCenter()
 
+    def getRadius(self):
+        return self.__movement.getRadius()
+
     ##########################   SETTERS   ##########################
     
     def draw(self):
@@ -69,12 +72,12 @@ class Blob(object):
 
     def _getMovementInterval(self):
         """ Timeout between moves """
-        return .001 * self.__movement.getRadius()
+        return Timeout.MOVEMENT * (self.__movement.getRadius() / 4)
 
     def _moveAtInterval(self, game):
         """ Move a food item based on decision class """
         while not self.__isDead.wait(timeout=self._getMovementInterval()):
-            self.__movement.move(game)
+            self.__movement.move(game, self.__id)
 
     def _waitForDecision(self, gameOverFlag):
         self.__decision.waitForDecision(self, gameOverFlag)
@@ -153,3 +156,41 @@ class Human(Blob):
 
         """ Pygame requires keyboard events to run in the main thread """
         self._waitForDecision(game.getGameOverFlag())
+
+
+###############################################################################
+##
+##                              AI class
+##
+###############################################################################
+class AI(Blob):
+    """An AI item.
+
+    Attributes:
+        id: The unique tag associated with each ai (ai_{count})
+        color: Black
+        decision: AIInput
+        movement: Circle_
+        isDead: Event representing life of AI. Triggered when eaten.
+    """
+
+    def __init__(self, id_, initialCenter):
+        """ Create an AI item """
+        Blob.__init__(  self, 
+                        id_             = id_,
+                        color           = Color.GREEN,
+                        decisionClass   = AIInput(),
+                        movementClass   = Circle_(
+                                            initialCenter, 
+                                            InitialUserRadius.AI))
+
+    def start(self, game):
+        """ Spin up threads for making decisions and moving """
+        decisionThread = threading.Thread(
+                            target = self._waitForDecision,
+                            args = [game.getGameOverFlag()])
+        movementThread = threading.Thread(
+                            target = self._moveAtInterval,
+                            args = [game])
+        decisionThread.start()
+        movementThread.start()

@@ -88,7 +88,7 @@ class SyncGameBoard(object):
     def getHeight(self):
         return self.__height
 
-    def getLockAtCenter(self, centerPosition):
+    def getLockAtPosition(self, centerPosition):
         (col, row) = centerPosition
         return self.__locks[row][col]
 
@@ -104,11 +104,16 @@ class SyncGameBoard(object):
     def updateBackground(self):
         self.__display.blit(self.__background, (0, 0))
 
-    def setPlayerAtPosition(self, centerPosition, userID):
-        """ 
-            @TODO: Perhaps add check for self.__players boundaires
-            (though we know it will never go out of bounds since 
-                we're controlling it)
-        """
+    def placeUserOnBoard(self, centerPosition, userID):
+        self.getLockAtPosition(centerPosition).acquire()
+        self._setPlayerAtPosition(centerPosition, userID)
+
+    def pullUserFromBoard(self, centerPosition):
+        self.getLockAtPosition(centerPosition).release()
+        self._setPlayerAtPosition(centerPosition, None)
+
+    ########################   PROTECTED   ##########################
+
+    def _setPlayerAtPosition(self, centerPosition, userID):
         (col, row) = centerPosition
         self.__players[row][col] = userID

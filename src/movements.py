@@ -46,6 +46,9 @@ class Circle_(object):
     def getRadius(self):
         return self.__radius
 
+    def growByN(self, N):
+        self.__radius += N
+
     def getCurrentDirection(self):
         with self.__directionMutex:
             direction = self.__direction
@@ -58,9 +61,9 @@ class Circle_(object):
         with self.__directionMutex:
             self.__direction = direction
 
-    def move(self, game):
-        self.__directions[self.getCurrentDirection()](game.getGameboard())
-        self._checkCollisions(game)
+    def move(self, game, userID):
+        self.__directions[self.getCurrentDirection()](game.getGameboard(), userID)
+        self._checkCollisions(game, userID)
 
     def draw(self, color):  
         pygame.draw.circle(
@@ -71,45 +74,45 @@ class Circle_(object):
 
     #########################   PROTECTED   #########################
 
-    def _goLeft(self, gameboard):
+    def _goLeft(self, gameboard, userID):
         """ Move left """
         (col, row) = self.__center
 
         if (col - (self.__radius + 1)) >= 0:
-            gameboard.getLockAtCenter(self.__center).release()
+            gameboard.pullUserFromBoard(self.__center)
             self.__center = (col - 1, row)
-            gameboard.getLockAtCenter(self.__center).acquire()
+            gameboard.placeUserOnBoard(self.__center, userID)
 
-    def _goRight(self, gameboard):
+    def _goRight(self, gameboard, userID):
         """ Move right """
         boardWidth = gameboard.getWidth()
         (col, row) = self.__center
 
         if (col + (self.__radius + 1)) <= boardWidth:
-            gameboard.getLockAtCenter(self.__center).release()
+            gameboard.pullUserFromBoard(self.__center)
             self.__center = (col + 1, row)
-            gameboard.getLockAtCenter(self.__center).acquire()
+            gameboard.placeUserOnBoard(self.__center, userID)
 
-    def _goUp(self, gameboard):
+    def _goUp(self, gameboard, userID):
         """ Move up """
         (col, row) = self.__center
 
         if (row - (self.__radius + 1)) >= 0:
-            gameboard.getLockAtCenter(self.__center).release()
+            gameboard.pullUserFromBoard(self.__center)
             self.__center = (col, row - 1)
-            gameboard.getLockAtCenter(self.__center).acquire()
+            gameboard.placeUserOnBoard(self.__center, userID)
 
-    def _goDown(self, gameboard):
+    def _goDown(self, gameboard, userID):
         """ Move down """
         boardHeight = gameboard.getHeight()
         (col, row) = self.__center
 
         if (row + (self.__radius + 1)) <= boardHeight:
-            gameboard.getLockAtCenter(self.__center).release()
+            gameboard.pullUserFromBoard(self.__center)
             self.__center = (col, row + 1)
-            gameboard.getLockAtCenter(self.__center).acquire()
+            gameboard.placeUserOnBoard(self.__center, userID)
 
-    def _stayInPlace(self, gameboard):
+    def _stayInPlace(self, gameboard, userID):
         """ Stay in place """
         return
 
@@ -119,33 +122,35 @@ class Circle_(object):
 ## So it can only change a few positions
 ## iF each user checks then we don't have to worry about faster users
 ##  moving multiple times for each move by a slower user
-    def _checkCollisions(self, game):
+    def _checkCollisions(self, game, userID):
         """ Go through all pixels in player's radius and check for a collision """
         gameboard = game.getGameboard()
         (centerCol, centerRow) = self.__center
         (width, height) = gameboard.getDimensions()
-        for col in range(centerCol - self.__radius, centerCol + self.__radius):
-            if col < 0 or col > height:
-                continue
-            for row in range(centerRow - self.__radius, centerRow + self.__radius):
-                if row < 0 or row > width:
-                    continue
-                elif gameboard.getLockAtCenter((col,row)).locked() and (col, row) != self.__center:
+        for col in range(max(0, centerCol - self.__radius), 
+                         min(height, centerCol + self.__radius)):
+            for row in range(max(0, centerRow - self.__radius), 
+                             min(width, centerRow + self.__radius)):
+                if gameboard.getLockAtPosition((col,row)).locked() \
+                        and (col, row) != self.__center:
                     print("Collision occured at (%s, %s)" % (col, row))
-                    """ 
-                    Here were would kill a user BUT we need some way of figuring out the
-                    userID of the user holding the lock
-                    """
                     blobID = gameboard.getPlayerAtPosition((col, row))
-                    self._handleCollisions(game, blobID)
+                    self._handleCollisions(game, userID, blobID)
                     return
 
-    def _handleCollisions(self, game, blobID):
+    def _handleCollisions(self, game, currentUserID, otherUserID):
         """ Kill the blob and increase the size of the player """
         """ TODO: probably need to add logic to handle different sized
             users (if a small users collides into a larger user, the larger 
             should still eat the smaller)"""
-        blob = game.getUserFromID(blobID)
-        game.getGameboard().getLockAtCenter(blob.getMovement().__center).release()
-        game.killUserWithID(blobID) 
-        self.__radius = self.__radius + blob.getMovement().__radius
+        otherUser = game.getUserFromID(otherUserID)
+        currentUser = game.getUserFromID(currentUserID)
+
+        if currentUser.getRadius() >= otherUser.getRadius():
+            userToKill = otherUser
+        else:
+            userToKill = currentUser
+
+        game.pullUserFromBoard(userToKill.getCenter())
+        game.killUserWithID(userToKill.getID()) 
+        self.growByN(userToKill.getRadius())

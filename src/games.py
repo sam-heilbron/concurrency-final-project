@@ -10,8 +10,9 @@
 import pygame
 import threading
 from boards import SyncGameBoard
-from users import Food
+from users import Food, AI
 from random import randint
+from enums import Timeout
 
 class Game(object):
     """A Game. Base class for all games.
@@ -42,8 +43,12 @@ class Game(object):
                     initialCenter = (randint(20, maxWidth - 20), 
                                      randint(20, maxHeight - 20))))
 
-        ##for a in range(1, aiCount):
-        ##    print("add ai user")
+        for a in range(1, aiCount + 1):
+            self.__userList.append(
+                AI( 
+                    id_ = "ai_" + str(a),
+                    initialCenter = (randint(20, maxWidth - 20), 
+                                     randint(20, maxHeight - 20))))
 
         """
             Append human last so that when all users are started,
@@ -68,6 +73,7 @@ class Game(object):
             return u
         except StopIteration:
             """ userID not in game currently """
+            print("user: -%s- not in game currently" % userID)
             pass
 
     ##########################   SETTERS   ##########################
@@ -80,6 +86,9 @@ class Game(object):
         except StopIteration:
             """ userID not in game currently """
             pass
+
+    def pullUserFromBoard(self, position):
+        self.__gameboard.pullUserFromBoard(position)
 
     ########################   START GAME   #########################
 
@@ -97,10 +106,7 @@ class Game(object):
             user.start(self)
 
     def _placeUserOnBoard(self, user):
-        userCenter = user.getCenter()
-        gameboard = self.getGameboard()
-        gameboard.getLockAtCenter(userCenter).acquire()
-        gameboard.setPlayerAtPosition(userCenter, user.getID())
+        self.__gameboard.placeUserOnBoard(user.getCenter(), user.getID())
 
 
     #########################   END GAME   ##########################
@@ -118,8 +124,10 @@ class Game(object):
 
     def _gameOver(self):
         print("Trigger Game over.")
+        # pygame.quit() Seems this is unnecessary
         for user in self.__userList:
             user.quit()
+
 
     ########################   DRAW BOARD   #########################
 
@@ -130,8 +138,8 @@ class Game(object):
                             args = [])
         drawingThread.start()
 
-    def _drawAtInterval(self, interval = .001):
-        while not self.__gameOverFlag.wait(timeout=interval):
+    def _drawAtInterval(self):
+        while not self.__gameOverFlag.wait(timeout=Timeout.GAMEOVER):
             self._draw()
 
     def _draw(self):

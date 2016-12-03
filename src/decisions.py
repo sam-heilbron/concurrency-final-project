@@ -9,9 +9,9 @@
 #
 
 from collections import defaultdict
-from enums import Direction, FPS
+from enums import Direction, Timeout
 import pygame
-import sys
+
 
 ###############################################################################
 ##
@@ -39,8 +39,6 @@ class Basic(object):
 
     def quitGame(self, gameOverFlag):
         gameOverFlag.set()
-        pygame.quit()
-        sys.exit()
 
 
 ###############################################################################
@@ -55,9 +53,8 @@ class Stationary(Basic):
     ## have a thread alive as long as the user is alive
     def waitForDecision(self, user, gameOverFlag):
         """ DEFAULT: Loop on nothing """
-        clock = pygame.time.Clock()
-        while not user.isDead():
-            clock.tick(FPS.DECISION)
+        while not user.isDead().wait(timeout = Timeout.DECISION):
+            1
 
 
 ###############################################################################
@@ -89,8 +86,7 @@ class KeyInput(Basic):
         )
 
     def waitForDecision(self, user, gameOverFlag):
-        clock = pygame.time.Clock()
-        while 1:
+        while not user.isDead().wait(timeout = Timeout.DECISION):
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_q:
@@ -99,8 +95,8 @@ class KeyInput(Basic):
                         self.turn(user.getMovement(), event.key)
                 elif event.type == pygame.QUIT:
                     self.quitGame(gameOverFlag)
-            """ 20 frames per second """
-            clock.tick(FPS.DECISION)      
+
+        self.quitGame(gameOverFlag)    
 
     def turn(self, movement, keyPressed):
         return self.__directions[keyPressed](movement)
@@ -133,11 +129,7 @@ class MouseInput(Basic):
         )
 
     def waitForDecision(self, user, gameOverFlag):
-        """ @TODO: would like to switch while 1 --> while not user.isDead ()
-            but that was causing issues. will look into
-        """
-        clock = pygame.time.Clock()
-        while 1:
+        while not user.isDead().wait(timeout = Timeout.DECISION):
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEMOTION:
                     self.turn(user.getMovement(), event.pos)
@@ -146,8 +138,8 @@ class MouseInput(Basic):
                         self.quitGame(gameOverFlag)
                 elif event.type == pygame.QUIT:
                     self.quitGame(gameOverFlag)
-            """ 20 frames per second """
-            clock.tick(FPS.DECISION)
+
+        self.quitGame(gameOverFlag)
      
 
     def turn(self, movement, mousePosition):
@@ -175,5 +167,10 @@ class AIInput(Basic):
     @TODO: create decision algorithm for ai to move on its own
     """
 
+    def waitForDecision(self, user, gameOverFlag):
+        clock = pygame.time.Clock()
+        while not user.isDead().wait(timeout = Timeout.DECISION):
+            self.turn(user.getMovement())    
+
     def turn(self, movement):
-        print("ai move")
+        return self.turnLeft(movement)

@@ -63,7 +63,7 @@ def createAndStartGame(user):
 	game = Game(
 			humanUser 			= user,
 			initialFoodCount 	= 5,
-			initialAiCount 		= 0)
+			initialAiCount 		= 1)
 	game.start()
 
 
