@@ -8,7 +8,7 @@
 #   List of user classes
 
 import threading
-from decisions import Stationary, KeyInput, AIInput
+from decisions import Stationary, KeyInput, AIRandom
 from movements import Circle_
 from enums import InitialUserRadius, Color, Timeout
 
@@ -179,7 +179,7 @@ class AI(Blob):
         Blob.__init__(  self, 
                         id_             = id_,
                         color           = Color.GREEN,
-                        decisionClass   = AIInput(),
+                        decisionClass   = AIRandom(),
                         movementClass   = Circle_(
                                             initialCenter, 
                                             InitialUserRadius.AI))

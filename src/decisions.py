@@ -11,6 +11,7 @@
 from collections import defaultdict
 from enums import Direction, Timeout
 import pygame
+from random import randint
 
 
 ###############################################################################
@@ -52,9 +53,8 @@ class Stationary(Basic):
     ## Theoretically you could just return, but it's more realistic to 
     ## have a thread alive as long as the user is alive
     def waitForDecision(self, user, gameOverFlag):
-        """ DEFAULT: Loop on nothing """
-        while not user.isDead().wait(timeout = Timeout.DECISION):
-            1
+        """ DEFAULT: Wait for user to die """
+        user.isDead().wait()
 
 
 ###############################################################################
@@ -161,16 +161,29 @@ class MouseInput(Basic):
 ##                              AIInput class
 ##
 ###############################################################################
-class AIInput(Basic):
+class AIRandom(Basic):
     """ Decision class for AI input (auto-move) 
 
     @TODO: create decision algorithm for ai to move on its own
     """
+    def __init__(self):
+
+        self.__directions   = dict(
+            {
+                0 : self.noTurn,
+                1 : self.turnLeft,
+                2 : self.turnRight,
+                3 : self.turnUp,
+                4 : self.turnDown
+            }
+        )
+
 
     def waitForDecision(self, user, gameOverFlag):
         clock = pygame.time.Clock()
-        while not user.isDead().wait(timeout = Timeout.DECISION):
+        while not user.isDead().wait(timeout = Timeout.SLOWDECISION):
             self.turn(user.getMovement())    
 
     def turn(self, movement):
-        return self.turnLeft(movement)
+        return self.__directions[randint(0, 4)](movement)
+        

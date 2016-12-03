@@ -33,6 +33,7 @@ InitialUserRadius = enum(
 Timeout = enum(
 	MOVEMENT = .001,
 	DECISION = .05,
+	SLOWDECISION = .1,
 	GAMEOVER = .0001)
 
 # Frames per Second
