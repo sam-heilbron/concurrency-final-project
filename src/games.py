@@ -11,7 +11,7 @@
 import pygame
 import threading
 from boards import SyncGameBoard
-from users import Food, AI
+from users import Food, AISmart, AIRandom
 from random import randint
 from enums import Timeout
 
@@ -26,16 +26,21 @@ class Game(object):
 
     def __init__(   self,
                     humanUser,
-                    initialFoodCount    = 4,
-                    initialAiCount      = 0,
-                    boardType           = SyncGameBoard()):
+                    initialFoodCount        = 4,
+                    initialSmartAiCount     = 0,
+                    initialRandomAiCount    = 0,
+                    boardType               = SyncGameBoard()):
         self.__userList     = []
         self.__gameboard    = boardType
         self.__gameOverFlag = threading.Event()
 
-        self.createUsers(initialFoodCount, initialAiCount, humanUser)
+        self.createUsers(
+            initialFoodCount, 
+            initialSmartAiCount, 
+            initialRandomAiCount,
+            humanUser)
 
-    def createUsers(self, foodCount, aiCount, human):
+    def createUsers(self, foodCount, smartAiCount, randomAiCount, human):
         maxWidth, maxHeight = self.__gameboard.getDimensions()
         for f in range(1, foodCount + 1):
             self.__userList.append(
@@ -44,10 +49,17 @@ class Game(object):
                     initialCenter = (randint(20, maxWidth - 20), 
                                      randint(20, maxHeight - 20))))
 
-        for a in range(1, aiCount + 1):
+        for a in range(1, smartAiCount + 1):
             self.__userList.append(
-                AI( 
-                    id_ = "ai_" + str(a),
+                AISmart( 
+                    id_ = "smart_ai_" + str(a),
+                    initialCenter = (randint(20, maxWidth - 20), 
+                                     randint(20, maxHeight - 20))))
+
+        for a in range(1, randomAiCount + 1):
+            self.__userList.append(
+                AIRandom( 
+                    id_ = "random_ai_" + str(a),
                     initialCenter = (randint(20, maxWidth - 20), 
                                      randint(20, maxHeight - 20))))
 
@@ -69,27 +81,18 @@ class Game(object):
         return self.__gameOverFlag
 
     def getUserFromID(self, userID):
-        try:
+            """ raises StopIteration if userID not found """
             u = next(user for user in self.__userList if user.getID() == userID)
             return u
-        except StopIteration:
-            """ userID not in game currently """
-            print("user: -%s- not in game currently" % userID)
-            pass
 
     def getHumanUser(self):
-        try:
-            u = next(user for user in self.__userList if user.getID() == "human")
-            return u
-        except StopIteration:
-            """ userID not in game currently """
-            pass
+            return self.getUserFromID("human")
 
     ##########################   SETTERS   ##########################
 
     def killUserWithID(self, userID):
         try:
-            u = next(user for user in self.__userList if user.getID() == userID)
+            u = self.getUserFromID(userID)
             u.quit()
             self.__userList.remove(u)
         except StopIteration:

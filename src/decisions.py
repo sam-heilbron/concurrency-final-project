@@ -161,11 +161,11 @@ class MouseInput(Basic):
 
 ###############################################################################
 ##
-##                              AIInput class
+##                              AISmart class
 ##
 ###############################################################################
-class AIRandom(Basic):
-    """ Decision class for AI input (auto-move)""" 
+class AISmartInput(Basic):
+    """ Decision class for AI to move towards human """ 
 
     def __init__(self):
         self.__directions   = defaultdict(
@@ -185,7 +185,11 @@ class AIRandom(Basic):
 
     def turn(self, movement, game):
         (col, row) = movement.getCenter()
-        (humanCol, humanRow) = game.getHumanUser().getCenter() 
+        try:
+            (humanCol, humanRow) = game.getHumanUser().getCenter() 
+        except StopIteration:
+            """ Human has been killed but not registered """
+            return
 
         colDifference = humanCol - col
         rowDifference = humanRow - row
@@ -195,3 +199,32 @@ class AIRandom(Basic):
             return self.__directions[(1, colDifference > 0)](movement)
 
         return self.__directions[(0, rowDifference > 0)](movement)
+
+
+###############################################################################
+##
+##                              AIRandom class
+##
+###############################################################################
+class AIRandomInput(Basic):
+    """ Decision class for AI to move randomly """
+    def __init__(self):
+
+        self.__directions   = dict(
+            {
+                0 : self.noTurn,
+                1 : self.turnLeft,
+                2 : self.turnRight,
+                3 : self.turnUp,
+                4 : self.turnDown
+            }
+        )
+
+
+    def waitForDecision(self, user, gameOverFlag):
+        clock = pygame.time.Clock()
+        while not user.isDead().wait(timeout = Timeout.SLOWDECISION):
+            self.turn(user.getMovement())    
+
+    def turn(self, movement):
+        return self.__directions[randint(0, 4)](movement)

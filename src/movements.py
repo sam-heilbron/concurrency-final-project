@@ -17,6 +17,7 @@ class Circle_(object):
     Attributes:
         center: The center of the circle.
         radius: The radius of the circle.
+        positionMutex: Controls atomic access to centr and radius variables
         direction: The current direction of the circle
         directionMutex: Controls atomic access to direction variable
         directions: Map of directions to movement methods
@@ -47,7 +48,7 @@ class Circle_(object):
         return center
 
     def getRadius(self):
-        with self.__directionMutex:
+        with self.__positionMutex:
             radius = self.__radius
         return radius
 
@@ -125,14 +126,10 @@ class Circle_(object):
         """ Stay in place """
         return
 
-##
-## We can change this to check only BORDER elements
-## This is because a piece only moves 1 space (no matter how quickly)
-## So it can only change a few positions
-## iF each user checks then we don't have to worry about faster users
-##  moving multiple times for each move by a slower user
     def _checkCollisions(self, game, user):
-        """ Go through all pixels in player's radius and check for a collision """
+        """ Go through all pixels in player's radius and 
+            check for a collision 
+        """
         gameboard = game.getGameboard()
         (centerCol, centerRow) = self.getCenter()
         radius = self.getRadius()
@@ -144,15 +141,12 @@ class Circle_(object):
                 if gameboard.getLockAtPosition((col,row)).locked() \
                         and (col, row) != (centerCol, centerRow):
                     print("Collision occured at (%s, %s)" % (col, row))
-                    blobID = gameboard.getPlayerAtPosition((col, row))
-                    self._handleCollisions(game, user, blobID)
+                    otherUserID = gameboard.getPlayerAtPosition((col, row))
+                    self._handleCollisions(game, user, otherUserID)
                     return
 
     def _handleCollisions(self, game, currentUser, otherUserID):
         """ Kill the blob and increase the size of the player """
-        """ TODO: probably need to add logic to handle different sized
-            users (if a small users collides into a larger user, the larger 
-            should still eat the smaller)"""
         try:
             otherUser = game.getUserFromID(otherUserID)
             if currentUser.getRadius() >= otherUser.getRadius():
@@ -175,5 +169,3 @@ class Circle_(object):
         game.killUserWithID(userToKill.getID())
 
         userToKill.releasePosition()
-            
-        

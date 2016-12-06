@@ -9,7 +9,7 @@
 #   List of user classes
 
 import threading
-from decisions import Stationary, KeyInput, AIRandom
+from decisions import Stationary, KeyInput, AIRandomInput, AISmartInput
 from movements import Circle_
 from enums import InitialUserRadius, Color, Timeout
 
@@ -100,44 +100,6 @@ class Blob(object):
 
 ###############################################################################
 ##
-##                              Food class
-##
-###############################################################################
-class Food(Blob):
-    """A Food item.
-
-    Attributes:
-        id: The unique tag associated with each food (food_{count})
-        color: Black
-        decision: Stationary
-        movement: Circle_
-        isDead: Event representing life of food. Triggered when eaten.
-    """
-
-    def __init__(self, id_, initialCenter):
-        """ Create a Food item """
-        Blob.__init__(  self, 
-                        id_             = id_,
-                        color           = Color.BLACK,
-                        decisionClass   = Stationary(),
-                        movementClass   = Circle_(
-                                            initialCenter, 
-                                            InitialUserRadius.FOOD))
-
-    def start(self, game):
-        """ Spin up threads for making decisions and moving """
-        decisionThread = threading.Thread(
-                            target = self._waitForDecision,
-                            args = [game])
-        movementThread = threading.Thread(
-                            target = self._moveAtInterval,
-                            args = [game])
-        decisionThread.start()
-        movementThread.start()
-
-
-###############################################################################
-##
 ##                              Human class
 ##
 ###############################################################################
@@ -175,7 +137,7 @@ class Human(Blob):
 
 ###############################################################################
 ##
-##                              AI class
+##                              AI Base class
 ##
 ###############################################################################
 class AI(Blob):
@@ -189,15 +151,15 @@ class AI(Blob):
         isDead: Event representing life of AI. Triggered when eaten.
     """
 
-    def __init__(self, id_, initialCenter):
+    def __init__(self, id_, initialCenter, AIDecision, AISize, AIColor):
         """ Create an AI item """
         Blob.__init__(  self, 
                         id_             = id_,
-                        color           = Color.GREEN,
-                        decisionClass   = AIRandom(),
+                        color           = AIColor,
+                        decisionClass   = AIDecision,
                         movementClass   = Circle_(
                                             initialCenter, 
-                                            InitialUserRadius.AI))
+                                            AISize))
 
     def start(self, game):
         """ Spin up threads for making decisions and moving """
@@ -209,3 +171,81 @@ class AI(Blob):
                             args = [game])
         decisionThread.start()
         movementThread.start()
+
+
+###############################################################################
+##
+##                              Food class
+##
+###############################################################################
+class Food(AI):
+    """A Food item.
+
+    Attributes:
+        id: The unique tag associated with each food (food_{count})
+        color: Black
+        decision: Stationary
+        movement: Circle_
+        isDead: Event representing life of food. Triggered when eaten.
+    """
+
+    def __init__(self, id_, initialCenter):
+        """ Create an AI item """
+        AI.__init__(    self, 
+                        id_             = id_,
+                        initialCenter   = initialCenter,
+                        AIDecision      = Stationary(),
+                        AISize          = InitialUserRadius.FOOD,
+                        AIColor         = Color.BLACK)
+
+
+###############################################################################
+##
+##                              Smart AI class
+##
+###############################################################################
+class AISmart(AI):
+    """A Smart AI user.
+
+    Attributes:
+        id: The unique tag associated with each ai (ai_{count})
+        color: Black
+        decision: AIInput
+        movement: Circle_
+        isDead: Event representing life of AI. Triggered when eaten.
+    """
+
+    def __init__(self, id_, initialCenter):
+        """ Create an AI item """
+        AI.__init__(    self, 
+                        id_             = id_,
+                        initialCenter   = initialCenter,
+                        AIDecision      = AISmartInput(),
+                        AISize          = InitialUserRadius.AISMART,
+                        AIColor         = Color.BLUE)
+
+
+###############################################################################
+##
+##                              Random AI class
+##
+###############################################################################
+class AIRandom(AI):
+    """A Smart AI user.
+
+    Attributes:
+        id: The unique tag associated with each ai (ai_{count})
+        color: Black
+        decision: AIInput
+        movement: Circle_
+        isDead: Event representing life of AI. Triggered when eaten.
+    """
+
+    def __init__(self, id_, initialCenter):
+        """ Create an AI item """
+        AI.__init__(    self, 
+                        id_             = id_,
+                        initialCenter   = initialCenter,
+                        AIDecision      = AIRandomInput(),
+                        AISize          = InitialUserRadius.AIRANDOM,
+                        AIColor         = Color.GREEN)

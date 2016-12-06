@@ -113,12 +113,8 @@ class SyncGameBoard(object):
         self.getLockAtPosition(centerPosition).release()
 
     def moveUser(self, oldPosition, newPosition, user):
-        self._setPlayerAtPosition(oldPosition, None)
-        self.getLockAtPosition(oldPosition).release()
-        
-        self.getLockAtPosition(newPosition).acquire()
-        self._setPlayerAtPosition(newPosition, user.getID())
-
+        self.pullUserFromBoard(oldPosition)
+        self.placeUserOnBoard(newPosition, user.getID())
         user.setCenter(newPosition)
 
     ########################   PROTECTED   ##########################

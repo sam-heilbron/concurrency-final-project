@@ -26,17 +26,18 @@ Color = enum(
 	RED 	= (255, 0, 0))
 
 InitialUserRadius = enum(
-	FOOD	= 5,
-	AI		= 15,
-	HUMAN	= 10)
+	FOOD		= 5,
+	AISMART		= 25,
+	AIRANDOM 	= 15,
+	HUMAN		= 10)
 
 Timeout = enum(
-	MOVEMENT = .001,
-	DECISION = .05,
-	SLOWDECISION = .1,
-	GAMEOVER = .0001)
+	MOVEMENT 		= .001,
+	DECISION 		= .05,
+	SLOWDECISION 	= .1,
+	GAMEOVER 		= .0001)
 
 # Frames per Second
 FPS = enum(
 	DECISION 		= 20,
-	SLOWDECISION 	= 5)
+	SLOWDECISION	= 5)
