@@ -162,13 +162,18 @@ class Circle_(object):
                 userToKill = currentUser
                 userToLive = otherUser
         except:
+            """ It's possible that a user will be killed right before
+                it moves so the movement will still happen. This catches that
+                scenario since either otherUser.getRadius() or 
+                currentUser.getRadius() will fail since the user is None
+            """
             return
 
         center, radius = userToKill.holdPosition()
             
         userToLive.increaseRadiusByN(radius)
-        game.pullUserFromBoard(center)
+        game.killUserWithID(userToKill.getID())
 
         userToKill.releasePosition()
             
-        game.killUserWithID(userToKill.getID())
+        

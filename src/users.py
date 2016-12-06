@@ -91,6 +91,8 @@ class Blob(object):
         while not self.__isDead.wait(timeout=self._getMovementInterval()):
             self.__movement.move(game, self)
 
+        game.pullUserFromBoard(self.getCenter())
+
     def _waitForDecision(self, gameOverFlag):
         self.__decision.waitForDecision(self, gameOverFlag)
 
