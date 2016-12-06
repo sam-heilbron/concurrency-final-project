@@ -60,6 +60,18 @@ class Blob(object):
         return self.__movement.getRadius()
 
     ##########################   SETTERS   ##########################
+
+    def setCenter(self, newCenter):
+        self.__movement.setCenter(newCenter)
+
+    def increaseRadiusByN(self, radiusIncrease):
+        self.__movement.increaseRadiusByN(radiusIncrease)
+
+    def holdPosition(self):
+        return self.__movement.holdPosition()
+
+    def releasePosition(self):
+        self.__movement.releasePosition()
     
     def draw(self):
         self.__movement.draw(self.__color)
@@ -77,7 +89,7 @@ class Blob(object):
     def _moveAtInterval(self, game):
         """ Move a food item based on decision class """
         while not self.__isDead.wait(timeout=self._getMovementInterval()):
-            self.__movement.move(game, self.__id)
+            self.__movement.move(game, self)
 
     def _waitForDecision(self, gameOverFlag):
         self.__decision.waitForDecision(self, gameOverFlag)
