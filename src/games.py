@@ -3,7 +3,8 @@
 #   games.py
 #
 #   Sam Heilbron
-#   Last Updated: November 30, 2016
+#   Rachel Marison
+#   Last Updated: December 7, 2016
 #
 #   List of game classes
 
@@ -74,6 +75,14 @@ class Game(object):
         except StopIteration:
             """ userID not in game currently """
             print("user: -%s- not in game currently" % userID)
+            pass
+
+    def getHumanUser(self):
+        try:
+            u = next(user for user in self.__userList if user.getID() == "human")
+            return u
+        except StopIteration:
+            """ userID not in game currently """
             pass
 
     ##########################   SETTERS   ##########################

@@ -3,7 +3,8 @@
 #   users.py
 #
 #   Sam Heilbron
-#   Last Updated: November 30, 2016
+#   Rachel Marison
+#   Last Updated: December 7, 2016
 #
 #   List of user classes
 
@@ -93,8 +94,8 @@ class Blob(object):
 
         game.pullUserFromBoard(self.getCenter())
 
-    def _waitForDecision(self, gameOverFlag):
-        self.__decision.waitForDecision(self, gameOverFlag)
+    def _waitForDecision(self, game):
+        self.__decision.waitForDecision(self, game)
 
 
 ###############################################################################
@@ -127,7 +128,7 @@ class Food(Blob):
         """ Spin up threads for making decisions and moving """
         decisionThread = threading.Thread(
                             target = self._waitForDecision,
-                            args = [game.getGameOverFlag()])
+                            args = [game])
         movementThread = threading.Thread(
                             target = self._moveAtInterval,
                             args = [game])
@@ -169,7 +170,7 @@ class Human(Blob):
         movementThread.start()
 
         """ Pygame requires keyboard events to run in the main thread """
-        self._waitForDecision(game.getGameOverFlag())
+        self._waitForDecision(game)
 
 
 ###############################################################################
@@ -202,7 +203,7 @@ class AI(Blob):
         """ Spin up threads for making decisions and moving """
         decisionThread = threading.Thread(
                             target = self._waitForDecision,
-                            args = [game.getGameOverFlag()])
+                            args = [game])
         movementThread = threading.Thread(
                             target = self._moveAtInterval,
                             args = [game])

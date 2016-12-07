@@ -3,7 +3,8 @@
 #   main.py
 #
 #   Sam Heilbron
-#   Last Updated: November 21, 2016
+#   Rachel Marison
+#   Last Updated: December 7, 2016
 #
 #   starts the game
 
@@ -62,8 +63,8 @@ def createAndStartGame(user):
 
 	game = Game(
 			humanUser 			= user,
-			initialFoodCount 	= 5,
-			initialAiCount 		= 1)
+			initialFoodCount 	= 10,
+			initialAiCount 		= 3)
 	game.start()
 
 

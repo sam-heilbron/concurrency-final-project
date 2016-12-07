@@ -3,7 +3,8 @@
 #   decisions.py
 #
 #   Sam Heilbron
-#   Last Updated: November 21, 2016
+#   Rachel Marison
+#   Last Updated: December 7, 2016
 #
 #   List of decision classes
 #
@@ -52,7 +53,7 @@ class Stationary(Basic):
 
     ## Theoretically you could just return, but it's more realistic to 
     ## have a thread alive as long as the user is alive
-    def waitForDecision(self, user, gameOverFlag):
+    def waitForDecision(self, user, game):
         """ DEFAULT: Wait for user to die """
         user.isDead().wait()
 
@@ -85,7 +86,8 @@ class KeyInput(Basic):
             }
         )
 
-    def waitForDecision(self, user, gameOverFlag):
+    def waitForDecision(self, user, game):
+        gameOverFlag = game.getGameOverFlag()
         while not user.isDead().wait(timeout = Timeout.DECISION):
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
@@ -128,7 +130,8 @@ class MouseInput(Basic):
             }
         )
 
-    def waitForDecision(self, user, gameOverFlag):
+    def waitForDecision(self, user, game):
+        gameOverFlag = game.getGameOverFlag()
         while not user.isDead().wait(timeout = Timeout.DECISION):
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEMOTION:
@@ -162,28 +165,33 @@ class MouseInput(Basic):
 ##
 ###############################################################################
 class AIRandom(Basic):
-    """ Decision class for AI input (auto-move) 
+    """ Decision class for AI input (auto-move)""" 
 
-    @TODO: create decision algorithm for ai to move on its own
-    """
     def __init__(self):
-
-        self.__directions   = dict(
+        self.__directions   = defaultdict(
+            lambda: self.noTurn,
             {
-                0 : self.noTurn,
-                1 : self.turnLeft,
-                2 : self.turnRight,
-                3 : self.turnUp,
-                4 : self.turnDown
+                (1, 0)  : self.turnLeft,
+                (1, 1)  : self.turnRight,
+                (0, 0)  : self.turnUp,
+                (0, 1)  : self.turnDown
             }
         )
 
-
-    def waitForDecision(self, user, gameOverFlag):
+    def waitForDecision(self, user, game):
         clock = pygame.time.Clock()
         while not user.isDead().wait(timeout = Timeout.SLOWDECISION):
-            self.turn(user.getMovement())    
+            self.turn(user.getMovement(), game)    
 
-    def turn(self, movement):
-        return self.__directions[randint(0, 4)](movement)
-        
+    def turn(self, movement, game):
+        (col, row) = movement.getCenter()
+        (humanCol, humanRow) = game.getHumanUser().getCenter() 
+
+        colDifference = humanCol - col
+        rowDifference = humanRow - row
+
+        colDifferenceLarger = (abs(colDifference)) > (abs(rowDifference))
+        if colDifferenceLarger:
+            return self.__directions[(1, colDifference > 0)](movement)
+
+        return self.__directions[(0, rowDifference > 0)](movement)
