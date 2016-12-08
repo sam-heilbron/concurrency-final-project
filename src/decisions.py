@@ -2,17 +2,20 @@
 
 #   decisions.py
 #
-#   Sam Heilbron
-#   Rachel Marison
-#   Last Updated: December 7, 2016
+#   Sam Heilbron, Rachel Marison
+#   Last Updated: December 8, 2016
 #
-#   List of decision classes
-#
+#   List of decision classes:
+#       Stationary
+#       KeyInput
+#       MouseInput
+#       AISmartInput
+#       AIRandomInput
 
-from collections import defaultdict
-from enums import Direction, Timeout
 import pygame
+from collections import defaultdict
 from random import randint
+from enums import Direction, Timeout
 
 
 ###############################################################################
@@ -51,10 +54,11 @@ class Basic(object):
 class Stationary(Basic):
     """ Decision class for a Stationary player """
 
-    ## Theoretically you could just return, but it's more realistic to 
-    ## have a thread alive as long as the user is alive
     def waitForDecision(self, user, game):
-        """ DEFAULT: Wait for user to die """
+        """ DEFAULT: Wait for user to die 
+            Theoretically you could just return, but it's more realistic to 
+            have a thread alive as long as the user is alive
+        """
         user.isDead().wait()
 
 
@@ -87,6 +91,7 @@ class KeyInput(Basic):
         )
 
     def waitForDecision(self, user, game):
+        """ Handle keyboard presses """
         gameOverFlag = game.getGameOverFlag()
         while not user.isDead().wait(timeout = Timeout.DECISION):
             for event in pygame.event.get():
@@ -101,6 +106,7 @@ class KeyInput(Basic):
         self.quitGame(gameOverFlag)    
 
     def turn(self, movement, keyPressed):
+        """ Turn the user depending on the pressed key """
         return self.__directions[keyPressed](movement)
 
 
@@ -115,8 +121,9 @@ class MouseInput(Basic):
      Attributes:
         directions: Map of tuples to decision methods
             (colIsLarger, isPositive) is the pattern
-                Ex: Turn left if the column difference is larger 
-                    AND its negative
+                Ex: (1,0) results in a left turn because that means that 
+                the column difference is larger than the row difference and
+                the difference is negative. Therefore the mouse is to the left
     """
 
     def __init__(self):
@@ -131,6 +138,7 @@ class MouseInput(Basic):
         )
 
     def waitForDecision(self, user, game):
+        """ Handle mouse motion """
         gameOverFlag = game.getGameOverFlag()
         while not user.isDead().wait(timeout = Timeout.DECISION):
             for event in pygame.event.get():
@@ -143,9 +151,9 @@ class MouseInput(Basic):
                     self.quitGame(gameOverFlag)
 
         self.quitGame(gameOverFlag)
-     
 
     def turn(self, movement, mousePosition):
+        """ Change the user direction based on the mouse position """
         (col, row) = movement.getCenter()
         (mouseCol, mouseRow) = mousePosition
 
@@ -165,7 +173,7 @@ class MouseInput(Basic):
 ##
 ###############################################################################
 class AISmartInput(Basic):
-    """ Decision class for AI to move towards human """ 
+    """ Decision class for AI that moves towards human """ 
 
     def __init__(self):
         self.__directions   = defaultdict(
@@ -179,7 +187,6 @@ class AISmartInput(Basic):
         )
 
     def waitForDecision(self, user, game):
-        clock = pygame.time.Clock()
         while not user.isDead().wait(timeout = Timeout.SLOWDECISION):
             self.turn(user.getMovement(), game)    
 
@@ -220,9 +227,7 @@ class AIRandomInput(Basic):
             }
         )
 
-
-    def waitForDecision(self, user, gameOverFlag):
-        clock = pygame.time.Clock()
+    def waitForDecision(self, user, game):
         while not user.isDead().wait(timeout = Timeout.SLOWDECISION):
             self.turn(user.getMovement())    
 

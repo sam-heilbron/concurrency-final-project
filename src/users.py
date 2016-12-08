@@ -2,9 +2,8 @@
 
 #   users.py
 #
-#   Sam Heilbron
-#   Rachel Marison
-#   Last Updated: December 7, 2016
+#   Sam Heilbron, Rachel Marison
+#   Last Updated: December 8, 2016
 #
 #   List of user classes
 
@@ -90,7 +89,7 @@ class Blob(object):
     def _moveAtInterval(self, game):
         """ Move a food item based on decision class """
         while not self.__isDead.wait(timeout=self._getMovementInterval()):
-            self.__movement.move(game, self)
+            self.__movement.move(self, game)
 
         game.pullUserFromBoard(self.getCenter())
 
@@ -107,7 +106,7 @@ class Human(Blob):
     """A Human player.
 
     Attributes:
-        id: The unique tag associated with human (human)
+        id: 'human'
         color: Red
         decision: Either KeyInput or MouseInput
         movement: Circle_
@@ -141,18 +140,18 @@ class Human(Blob):
 ##
 ###############################################################################
 class AI(Blob):
-    """An AI item.
+    """ An AI Blob.
 
     Attributes:
-        id: The unique tag associated with each ai (ai_{count})
-        color: Black
-        decision: AIInput
+        id: The unique tag associated with each ai
+        color: The color of the AI
+        decision: The decision instance of the AI
         movement: Circle_
         isDead: Event representing life of AI. Triggered when eaten.
     """
 
     def __init__(self, id_, initialCenter, AIDecision, AISize, AIColor):
-        """ Create an AI item """
+        """ Create an AI Blob """
         Blob.__init__(  self, 
                         id_             = id_,
                         color           = AIColor,
@@ -190,7 +189,7 @@ class Food(AI):
     """
 
     def __init__(self, id_, initialCenter):
-        """ Create an AI item """
+        """ Create an Food item """
         AI.__init__(    self, 
                         id_             = id_,
                         initialCenter   = initialCenter,
@@ -208,15 +207,15 @@ class AISmart(AI):
     """A Smart AI user.
 
     Attributes:
-        id: The unique tag associated with each ai (ai_{count})
-        color: Black
-        decision: AIInput
+        id: The unique tag associated with each ai (smart_ai_{count})
+        color: Blue
+        decision: AISmartInput
         movement: Circle_
         isDead: Event representing life of AI. Triggered when eaten.
     """
 
     def __init__(self, id_, initialCenter):
-        """ Create an AI item """
+        """ Create an AI that moves towards the human """
         AI.__init__(    self, 
                         id_             = id_,
                         initialCenter   = initialCenter,
@@ -234,15 +233,15 @@ class AIRandom(AI):
     """A Smart AI user.
 
     Attributes:
-        id: The unique tag associated with each ai (ai_{count})
-        color: Black
-        decision: AIInput
+        id: The unique tag associated with each ai (random_ai_{count})
+        color: Green
+        decision: AIRandomInput
         movement: Circle_
         isDead: Event representing life of AI. Triggered when eaten.
     """
 
     def __init__(self, id_, initialCenter):
-        """ Create an AI item """
+        """ Create an AI that moves randomly """
         AI.__init__(    self, 
                         id_             = id_,
                         initialCenter   = initialCenter,

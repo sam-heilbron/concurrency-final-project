@@ -2,14 +2,16 @@
 
 #   boards.py
 #
-#   Sam Heilbron
-#   Last Updated: November 30, 2016
+#   Sam Heilbron, Rachel Marison
+#   Last Updated: December 8, 2016
 #
-#   List of board classes
+#   List of board classes:
+#       SyncGameBoard
 
 import threading
 import pygame
 from enums import Color
+
 
 ###############################################################################
 ##
@@ -17,14 +19,24 @@ from enums import Color
 ##
 ###############################################################################
 class SyncGameBoard(object):
+    """A thread-safe game board that works with pygame.
+
+    Attributes:
+        width: The width of the board
+        height: The height of the board
+        players: Board containing the center postion of all active players
+        locks: Locks restricting atomic access to players board 
+        display: pygame display
+        background: pygame background
+    """
+
     def __init__(self, width = 800, height = 700):
         self.__width        = width
-        self.__height       = height  
+        self.__height       = height 
+        self.__players      = self.initGameBoardPlayers()  
         self.__locks        = self.initGameBoardLocks()
-        self.__players      = self.initGameBoardPlayers() 
         self.__display      = None
         self.__background   = None
-
 
     #######################   INITIALIZERS   ########################
 
@@ -42,8 +54,7 @@ class SyncGameBoard(object):
                             pygame.FULLSCREEN)
 
     def _initializeBackground(self):
-        background = pygame.Surface(
-                        self.__display.get_size())
+        background = pygame.Surface(self.__display.get_size())
         self.__background = background.convert()
         self.__background.fill(Color.WHITE)
 
@@ -89,8 +100,12 @@ class SyncGameBoard(object):
         return self.__height
 
     def getLockAtPosition(self, centerPosition):
-        (col, row) = centerPosition
-        return self.__locks[row][col]
+        try:
+            (col, row) = centerPosition
+            return self.__locks[row][col]
+        except IndexError:
+            print("There was an error when trying to acquire lock at %s" \
+                % centerPosition)
 
     def getPlayerAtPosition(self, centerPosition):
         (col, row) = centerPosition

@@ -2,22 +2,28 @@
 
 #   movements.py
 #
-#   Sam Heilbron
-#   Last Updated: November 30, 2016
+#   Sam Heilbron, Rachel Marison
+#   Last Updated: December 8, 2016
 #
-#   List of movement classes
+#   List of movement classes:
+#       Circle_
 
-from enums import Direction, Color
 import threading
 import pygame
+from enums import Direction, Color
 
+###############################################################################
+##
+##                              Circle_ class
+##
+###############################################################################
 class Circle_(object):
-    """A Circle. Class circular blobs.
+    """A circular blob.
 
     Attributes:
         center: The center of the circle.
         radius: The radius of the circle.
-        positionMutex: Controls atomic access to centr and radius variables
+        positionMutex: Controls atomic access to center and radius variables
         direction: The current direction of the circle
         directionMutex: Controls atomic access to direction variable
         directions: Map of directions to movement methods
@@ -71,7 +77,7 @@ class Circle_(object):
     def releasePosition(self):
         self.__positionMutex.release()
 
-    def move(self, game, user):
+    def move(self, user, game):
         self.__directions[self.getCurrentDirection()](game.getGameboard(), user)
         self._checkCollisions(game, user)
 
@@ -127,7 +133,7 @@ class Circle_(object):
         return
 
     def _checkCollisions(self, game, user):
-        """ Go through all pixels in player's radius and 
+        """ Go through all pixels within player's radius and 
             check for a collision 
         """
         gameboard = game.getGameboard()
@@ -146,7 +152,7 @@ class Circle_(object):
                     return
 
     def _handleCollisions(self, game, currentUser, otherUserID):
-        """ Kill the blob and increase the size of the player """
+        """ Kill the smaller blob and increase the size of larger blob """
         try:
             otherUser = game.getUserFromID(otherUserID)
             if currentUser.getRadius() >= otherUser.getRadius():

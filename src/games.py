@@ -6,15 +6,21 @@
 #   Rachel Marison
 #   Last Updated: December 7, 2016
 #
-#   List of game classes
+#   List of game classes:
+#       Game
 
-import pygame
 import threading
+import pygame
+from random import randint
 from boards import SyncGameBoard
 from users import Food, AISmart, AIRandom
-from random import randint
 from enums import Timeout
 
+###############################################################################
+##
+##                              Game class
+##
+###############################################################################
 class Game(object):
     """A Game. Base class for all games.
 
@@ -41,27 +47,32 @@ class Game(object):
             humanUser)
 
     def createUsers(self, foodCount, smartAiCount, randomAiCount, human):
+        """ Create the oppponents and add them to the player list """
         maxWidth, maxHeight = self.__gameboard.getDimensions()
+
+        wMin, wMax = (20, maxWidth - 20)
+        hMin, hMax = (20, maxHeight - 20)
+
         for f in range(1, foodCount + 1):
             self.__userList.append(
                 Food( 
                     id_ = "food_" + str(f),
-                    initialCenter = (randint(20, maxWidth - 20), 
-                                     randint(20, maxHeight - 20))))
+                    initialCenter = (randint(wMin, wMax), 
+                                     randint(hMin, hMax))))
 
         for a in range(1, smartAiCount + 1):
             self.__userList.append(
                 AISmart( 
                     id_ = "smart_ai_" + str(a),
-                    initialCenter = (randint(20, maxWidth - 20), 
-                                     randint(20, maxHeight - 20))))
+                    initialCenter = (randint(wMin, wMax), 
+                                     randint(hMin, hMax))))
 
         for a in range(1, randomAiCount + 1):
             self.__userList.append(
                 AIRandom( 
                     id_ = "random_ai_" + str(a),
-                    initialCenter = (randint(20, maxWidth - 20), 
-                                     randint(20, maxHeight - 20))))
+                    initialCenter = (randint(wMin, wMax), 
+                                     randint(hMin, hMax))))
 
         """
             Append human last so that when all users are started,
@@ -113,6 +124,7 @@ class Game(object):
         self._startUsers()
 
     def _startUsers(self):
+        """ Start all the users in the game """
         for user in self.__userList:
             self._placeUserOnBoard(user)
             user.start(self)
@@ -124,6 +136,7 @@ class Game(object):
     #########################   END GAME   ##########################
 
     def _startGameOverListener(self):
+        """ Listen for end of game """
         gameListenerThread = threading.Thread(
                                 target = self._waitForGameOver,
                                 args = [])
@@ -135,8 +148,8 @@ class Game(object):
         self._gameOver()
 
     def _gameOver(self):
+        """ Quit all user threads """
         print("Trigger Game over.")
-        # pygame.quit() Seems this is unnecessary
         for user in self.__userList:
             user.quit()
 
@@ -144,7 +157,7 @@ class Game(object):
     ########################   DRAW BOARD   #########################
 
     def _startDrawing(self):
-        """ Spawn drawing in another thread """
+        """ Spawn a drawing thread """
         drawingThread = threading.Thread(
                             target = self._drawAtInterval,
                             args = [])
@@ -155,6 +168,7 @@ class Game(object):
             self._draw()
 
     def _draw(self):
+        """ Draw the gameboard with all active users """
         self.__gameboard.updateBackground()
         
         for user in self.__userList:
