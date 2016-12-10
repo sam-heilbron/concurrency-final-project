@@ -3,7 +3,7 @@
 
 ### Concept
 
-This is a game of tag, very similar to [agar.io](http://agar.io). Users join a game and they move around an enclosed space as a spehere trying to "eat" others. When they do, they become larger and as a result slower. If you are eaten, you are eliminated and the game is over. To "eat" someone you must overlap their center position. There are also small food items sitting around that don't move and allow players to grow easily. There are 2 forms of AI opponents, one type that moves randomly and another that moves towards you. You have 30 seconds to eat all the opponents (AI and Food) or you lose.
+This is a game of tag, very similar to [agar.io](http://agar.io). Users join a game and they move around an enclosed space as a sphere trying to "eat" others. When they do, they become larger and as a result slower. If you are eaten, you are eliminated and the game is over. To "eat" someone you must overlap their center position. There are also small food items sitting around that don't move and allow players to grow easily. There are 2 forms of AI opponents, one type that moves randomly and another that moves towards you. You have 30 seconds to eat all the opponents (AI and Food) or you lose.
 
 
 ### How to Run
