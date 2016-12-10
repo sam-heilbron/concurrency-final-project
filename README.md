@@ -7,10 +7,7 @@
 
 ### Included Files:
 
-1. **main.py**:
-	-	Prints out an opening message
-    -	Prompts the user to choose between mouse input and key input
-    -	Starts the game
+1. **main.py**: Prints out an opening message explaining the rules of the game to the user. It then prompts the user to select their preferred form of input (mouse or keyboard). A game is then started by creating and running an instance of the Game class
 
 2. **games.py**:
 	Contains all possible game classes. A Game is a wrapper for all components of a game. It keeps track of the users alive in the game (userList). It also keeps track of the gameboard, which is described more in boards.py below. It sets up all the users, draws and redraws them on the board, and kills users that have been eaten. It also listens for the game to finish by waiting on the gameOverFlag, which is signaled when the human is eaten, and the gameOverTimeout, which is signaled when the game clock has run out.
@@ -20,21 +17,21 @@
 
 4. **decisions.py**:
 	Contains all possible decision classes. Decision classes represent the types of decisions that users make in order to move. All classes are built on top of the Basic class which connects the decision that is made to the movement class (see below). 
-       	*	The Stationary class always decides to stay in place. 
-        *	The KeyInput class handles keyboard inputs to change the users direction.
-        *	The MouseInput class handles mouse movements to change the users direction.
-        *	The AISmartInput class decides to move towards where the human player is
-        *	The AIRandomInput class randomly chooses a direction to go in
+       	-	The Stationary class always decides to stay in place. 
+        -	The KeyInput class handles keyboard inputs to change the users direction.
+        -	The MouseInput class handles mouse movements to change the users direction.
+        -	The AISmartInput class decides to move towards where the human player is
+        -	The AIRandomInput class randomly chooses a direction to go in
 
 5. **movements.py**:
 	Contains all the possible movement classes. In this game, all user blobs are circles and the Circle_ class handles the actual movement of the users.
-        	* Circle contains attributes like center, (the center position of the circle), radius (the radius of the circle), and direction (the current direction that the circle is going in). The Circle class also has the mutexes positionMutex (has access to the center and radius variables) and directionMutex (has access to the direction variable).
-        	•The Circle class handles movement by calling moveUser() in boards.py, which removes the user from it's current position (removes the user ID from the players board, and releases the lock in the lock board), places the user on it's new position (setting the user ID to the new position in the players board and acquiring the new lock in the lock board), and finally sets the center attribute to the new center position. After moving the user, the checkCollisions() function is called. This function checks all positions in the lock board that lie within the user’s radius to see if any of the positions are locked. If there are, that means a collision has occurred, and the bigger user will "eat" the smaller user.
+       	-	Circle contains attributes like center, (the center position of the circle), radius (the radius of the circle), and direction (the current direction that the circle is going in). The Circle class also has the mutexes positionMutex (has access to the center and radius variables) and directionMutex (has access to the direction variable).
+       	-	The Circle class handles movement by calling moveUser() in boards.py, which removes the user from it's current position (removes the user ID from the players board, and releases the lock in the lock board), places the user on it's new position (setting the user ID to the new position in the players board and acquiring the new lock in the lock board), and finally sets the center attribute to the new center position. After moving the user, the checkCollisions() function is called. This function checks all positions in the lock board that lie within the user’s radius to see if any of the positions are locked. If there are, that means a collision has occurred, and the bigger user will "eat" the smaller user.
 6. **users.py**:
     Contains all the possible user classes. All users are built off the base Blob class. The Blob class has decision and  movement classes (explained above), a color to display to the screen, and id to distinguish them from other blobs and a threading event isDead which is triggered when the user is eaten. This event kills the threads which are controlling the users decision and movement threads.
-        * The **Human** class represent the human user in the game. When the game starts, the Human class will spawn off a thread to move at regular intervals based on the user's decisions. The larger the user is, the slower the intervals will be, thus making bigger users move slowly and smaller users move fast.
-        * The AI class is a base class for all non-human users. When the game starts, it will spawn off two threads, one for regularly waiting for decisions, and the other for regularly moving based on the decisions. Again, the larger the user is, the slower the movement intervals will be.
-        * The Food class, AISmart class, and AIRandom class all inherit the AI class. Food has the decision class Stationary and the movement class Circle. AISmart has the decision class AISmartInput and the movement class Circle. AIRandom has the decision class AIRandomInput and the movement class Circle. 
+        -	The **Human** class represent the human user in the game. When the game starts, the Human class will spawn off a thread to move at regular intervals based on the user's decisions. The larger the user is, the slower the intervals will be, thus making bigger users move slowly and smaller users move fast.
+        -	The AI class is a base class for all non-human users. When the game starts, it will spawn off two threads, one for regularly waiting for decisions, and the other for regularly moving based on the decisions. Again, the larger the user is, the slower the movement intervals will be.
+        -	The Food class, AISmart class, and AIRandom class all inherit the AI class. Food has the decision class Stationary and the movement class Circle. AISmart has the decision class AISmartInput and the movement class Circle. AIRandom has the decision class AIRandomInput and the movement class Circle. 
 
 7. **enums.py**:
 	This file contains all enumerations used in the code. These include Direction, Color, InitialUserRaidus, and Timeout.
