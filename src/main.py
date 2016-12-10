@@ -29,14 +29,21 @@ def openingMessage():
 
 	os.system('clear')
 
-	print("Welcome to the game of tag. \n\
-	Your goal is to move your red player around the board. \n\
-	If you collide with another player, the larger one eats the other \n\
-		and the smaller one loses. \n\
-	As you eat other players, your move more slowly \n\
-	Food sources will generate and don't move \n\
-	Opponents can be other humans or robots \n\
-	GOOD LUCK!! \n")
+	welcomeScreen = "Welcome to the game of tag!. \n\n\
+	The rules are as follows: \n\
+		1. You control the red player, which starts in the top left corner \n\
+		2. If you collide with another player, \n\
+			the larger one eats the smaller one \n\
+		3. The larger you are, the slower you move \n\
+		4. If you eat all the opponents you win \n\
+		5. You have 30 seconds before the game is over and you lose \n\n\
+	You will find the following opponents on the board: \n\
+		BLACK - These are food sources and Can't move \n\
+		GREEN - These are AI's that will move in a random pattern \n\
+		BLUE - These are AI's that will move towards you \n\n\
+	GOOD LUCK!\n"
+
+	sys.stdout.write("{:<7}\n".format(welcomeScreen))
 
 	print("press any key to continue...")
 	getch.getch()
@@ -49,9 +56,12 @@ def getUserInput():
 	""" Loop on invalid inputs """
 	while(c != 'k' and c != 'm'): 
 		os.system('clear')
-		print("Select your input type by typing a key: \n\
-			k: keyboard input (arrow keys) \n\
-			m: mouse input \n ")
+		keyboardOptionScreen = "Select your input type: \n\
+		Keyboard: Use the arrow keys to control your movement. \n\
+			press k to select \n\
+		Mouse: Use the mouse to control your movement\n\
+			press m to select \n "
+		sys.stdout.write("{:<7}\n".format(keyboardOptionScreen))
 		c = getch.getch()
 	print("The game will begin shortly...\n")
 

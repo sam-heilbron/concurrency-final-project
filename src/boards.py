@@ -3,7 +3,7 @@
 #   boards.py
 #
 #   Sam Heilbron, Rachel Marison
-#   Last Updated: December 8, 2016
+#   Last Updated: December 9, 2016
 #
 #   List of board classes:
 #       SyncGameBoard
@@ -48,23 +48,26 @@ class SyncGameBoard(object):
         self.updateDisplay()
 
     def _initializeDisplay(self):
+        """ Create the pygame display """
         self.__display = pygame.display.set_mode(
                             (self.__width, self.__height), 
                             pygame.FULLSCREEN,
                             32)
 
     def _initializeBackground(self):
+        """ Create the background for the game """
         background = pygame.Surface(self.__display.get_size())
         self.__background = background.convert()
         self.__background.fill(Color.WHITE)
 
 
     def _initializeTitle(self):
+        """ Initialize the title to the display """
         titleFont = pygame.font.Font(None, 50)
         titleText = titleFont.render("TAG", 1, Color.BLACK)
         titleTextpos = titleText.get_rect(
                             centerx = self.__background.get_width()/2)
-        helpFont = pygame.font.Font(None, 36)
+        helpFont = pygame.font.Font(None, 25)
         helpText = helpFont.render("Press q to quit", 1, Color.RED)
         helpTextpos = helpText.get_rect(
                             right = self.__background.get_width() - 10)
@@ -120,20 +123,24 @@ class SyncGameBoard(object):
         self.__display.blit(self.__background, (0, 0))
 
     def updateTimeClock(self, timeRemaining):
+        """ Update the time that is visible to the user """
         timeFont = pygame.font.Font(None, 36)
         timeText = timeFont.render(str(timeRemaining), 1, Color.RED)
         timeTextpos = timeText.get_rect(left = 30)
         self.__display.blit(timeText, timeTextpos)
 
     def placeUserOnBoard(self, centerPosition, userID):
+        """ Place a player on the board """
         self.getLockAtPosition(centerPosition).acquire()
         self._setPlayerAtPosition(centerPosition, userID)
 
     def pullUserFromBoard(self, centerPosition):
+        """ Remove a player from its place on the board """
         self._setPlayerAtPosition(centerPosition, None)
         self.getLockAtPosition(centerPosition).release()
 
     def moveUser(self, oldPosition, newPosition, user):
+        """ Move a user from one place to another """
         user.setCenter(newPosition)
         self.pullUserFromBoard(oldPosition)
         self.placeUserOnBoard(newPosition, user.getID())

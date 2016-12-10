@@ -83,7 +83,7 @@ class Blob(object):
 
     def _getMovementInterval(self):
         """ Timeout between moves """
-        return Timeout.MOVEMENT * (self.__movement.getRadius() / 4)
+        return Timeout.MOVEMENT * (self.__movement.getRadius() / 3)
 
     def _moveAtInterval(self, game):
         """ Move a food item based on decision class """

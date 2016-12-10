@@ -3,7 +3,7 @@
 #   games.py
 #
 #   Sam Heilbron, Rachel Marison
-#   Last Updated: December 7, 2016
+#   Last Updated: December 9, 2016
 #
 #   List of game classes:
 #       Game
@@ -73,11 +73,12 @@ class Game(object):
                                      randint(hMin, hMax))))
 
         for a in range(1, smartAiCount + 1):
+            """ Ensure that smart AI's start on the other half of the board """
             self.__userList.append(
                 AISmart( 
                     id_ = "smart_ai_" + str(a),
                     initialCenter = (randint(wMin, wMax), 
-                                     randint(hMin, hMax))))
+                                     randint(int(hMax/2), hMax))))
 
         for a in range(1, randomAiCount + 1):
             self.__userList.append(
@@ -191,8 +192,7 @@ class Game(object):
         while not self.__gameOverTimeout.wait(timeout = .5):
             if self._getRemainingTime() <= 0:
                 self.__gameOverTimeout.set()
-                print("You ran out of time.")
-                print("FINAL SCORE: %s" % self.getHumanUser().getRadius())
+                self._outOfTimeMessage()
         self.__gameOverFlag.set()
 
     def _gameOver(self):
@@ -200,7 +200,13 @@ class Game(object):
         for user in self.__userList:
             user.quit()
 
+    def _outOfTimeMessage(self):
+        """ Print a message to the user if they run out of time """
+        print("\n\nYou ran out of time.")
+        print("FINAL SCORE: %s" % self.getHumanUser().getRadius())
+
     def _win(self):
+        """ Notify the user that they won """
         print("CONGATULATIONS! YOU WON THE GAME")
 
 
@@ -214,6 +220,7 @@ class Game(object):
         drawingThread.start()
 
     def _drawAtInterval(self):
+        """ Draw the gameboard rapidly to account for position changes """
         self._setRemainingTime(COUNTDOWN_DELAY)
 
         while not self.__gameOverFlag.wait(timeout=Timeout.GAMEOVER):

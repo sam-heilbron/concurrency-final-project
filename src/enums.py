@@ -3,7 +3,7 @@
 #   enums.py
 #
 #   Sam Heilbron, Rachel Marison
-#   Last Updated: December 8, 2016
+#   Last Updated: December 9, 2016
 #
 #   List of enums:
 #		Direction
@@ -35,7 +35,7 @@ InitialUserRadius = enum(
 	HUMAN		= 10)
 
 Timeout = enum(
-	MOVEMENT 		= .001,
+	MOVEMENT 		= .0003,
 	DECISION 		= .05,
 	SLOWDECISION 	= .1,
 	GAMEOVER 		= .0001)
