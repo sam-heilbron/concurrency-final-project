@@ -9,11 +9,9 @@
 
 import os, sys
 import getch
-
 from games import Game
 from users import Human
 from decisions import KeyInput, MouseInput
-
 
 def main(argv):
 	openingMessage()
@@ -37,13 +35,13 @@ def openingMessage():
 		4. If you eat all the opponents you win \n\
 		5. You have 30 seconds before the game is over and you lose \n\n\
 	You will find the following opponents on the board: \n\
-		BLACK - These are food sources and Can't move \n\
-		GREEN - These are AI's that will move in a random pattern \n\
-		BLUE - These are AI's that will move towards you \n\n\
-	GOOD LUCK!\n"
+		BLACK - These are food sources and cannot move \n\
+		GREEN - These are AIs that will move in a random pattern \n\
+		BLUE - These are AIs that will move towards you \n\n\
+	GOOD LUCK!\n\n\
+	press any key to continue...\n"
 
 	sys.stdout.write("{:<7}\n".format(welcomeScreen))
-	sys.stdout.write("press any key to continue...")
 	getch.getch()
 
 def getUserInput():
