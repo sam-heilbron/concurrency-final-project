@@ -40,6 +40,7 @@ class SyncGameBoard(object):
     #######################   INITIALIZERS   ########################
 
     def initialize(self):
+        """ Initialize the gameboard """
         self._initializeDisplay()
         self._initializeBackground()
         self._initializeTitle()
@@ -75,12 +76,12 @@ class SyncGameBoard(object):
         self.__background.blit(helpText, helpTextpos)
 
     def initGameBoardLocks(self):
-        """ Init the board with a value in each position """
+        """ Initialize the board with a lock in each position """
         return [[threading.Lock() for r in range(self.__width + 1)] 
                     for c in range(self.__height + 1)]
         
     def initGameBoardPlayers(self):
-        """ This board holds players at their positions. """
+        """ This board holds the players center position. """
         return [[None for r in range(self.__width + 1)] 
                     for c in range(self.__height + 1)]
 
@@ -106,6 +107,7 @@ class SyncGameBoard(object):
             (col, row) = centerPosition
             return self.__locks[row][col]
         except IndexError:
+            """ See the README for information about this error """
             print("There was an error when trying to acquire lock at r:%s, c: %s" \
                 % (row, col))
             pass
@@ -148,5 +150,6 @@ class SyncGameBoard(object):
     ########################   PROTECTED   ##########################
 
     def _setPlayerAtPosition(self, centerPosition, userID):
+        """ Set a user id on the player board at a position """
         (col, row) = centerPosition
         self.__players[row][col] = userID

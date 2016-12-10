@@ -77,6 +77,7 @@ class Blob(object):
         self.__movement.draw(self.__color)
 
     def quit(self):
+        """ Kill the users movement and decision threads """
         self.__isDead.set()
 
     #########################   PROTECTED   #########################
@@ -86,13 +87,14 @@ class Blob(object):
         return Timeout.MOVEMENT * (self.__movement.getRadius() / 3)
 
     def _moveAtInterval(self, game):
-        """ Move a food item based on decision class """
+        """ Move a food item based on movement class """
         while not self.__isDead.wait(timeout=self._getMovementInterval()):
             self.__movement.move(self, game)
 
         game.pullUserFromBoard(self.getCenter())
 
     def _waitForDecision(self, game):
+        """ Change direction based on decision class """
         self.__decision.waitForDecision(self, game)
 
 

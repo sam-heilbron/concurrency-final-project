@@ -168,6 +168,9 @@ class Circle_(object):
             """
             return
 
+        """ Hold the position of the user that is about to die to ensure
+            that it doesn't move and possibly collide with someone 
+        """
         center, radius = userToKill.holdPosition()
             
         userToLive.increaseRadiusByN(radius)

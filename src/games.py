@@ -110,6 +110,7 @@ class Game(object):
         return u
 
     def getHumanUser(self):
+        """ Get the human user """
         return self.getUserFromID("human")
 
     def _getRemainingTime(self):

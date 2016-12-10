@@ -57,7 +57,8 @@ class Stationary(Basic):
     def waitForDecision(self, user, game):
         """ DEFAULT: Wait for user to die 
             Theoretically you could just return, but it's more realistic to 
-            have a thread alive as long as the user is alive
+            have a thread alive as long as the user is alive since the user
+            is actively making a decision (to stay stationary)
         """
         user.isDead().wait()
 
@@ -173,7 +174,15 @@ class MouseInput(Basic):
 ##
 ###############################################################################
 class AISmartInput(Basic):
-    """ Decision class for AI that moves towards human """ 
+    """ Decision class for AI that moves towards human 
+
+    Attributes:
+        directions: Map of tuples to decision methods
+            (colIsLarger, isPositive) is the pattern
+                Ex: (1,0) results in a left turn because that means that 
+                the column difference is larger than the row difference and
+                the difference is negative. Therefore the mouse is to the left
+    """ 
 
     def __init__(self):
         self.__directions   = defaultdict(
@@ -214,7 +223,11 @@ class AISmartInput(Basic):
 ##
 ###############################################################################
 class AIRandomInput(Basic):
-    """ Decision class for AI to move randomly """
+    """ Decision class for AI to move randomly 
+
+    Attributes:
+        directions: Map of numbers to directions
+    """
     def __init__(self):
 
         self.__directions   = dict(

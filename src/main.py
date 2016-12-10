@@ -29,7 +29,7 @@ def openingMessage():
 
 	os.system('clear')
 
-	welcomeScreen = "Welcome to the game of tag!. \n\n\
+	welcomeScreen = "Welcome to the game of tag! \n\n\
 	The rules are as follows: \n\
 		1. You control the red player, which starts in the top left corner \n\
 		2. If you collide with another player, \n\
@@ -44,17 +44,16 @@ def openingMessage():
 	GOOD LUCK!\n"
 
 	sys.stdout.write("{:<7}\n".format(welcomeScreen))
-
-	print("press any key to continue...")
+	sys.stdout.write("press any key to continue...")
 	getch.getch()
 
 def getUserInput():
 	""" Prompt user to choose between keys and mouse as input """
 
-	c = None
+	selectedCharacter = None
 
 	""" Loop on invalid inputs """
-	while(c != 'k' and c != 'm'): 
+	while selectedCharacter not in ('k','m'): 
 		os.system('clear')
 		keyboardOptionScreen = "Select your input type: \n\
 		Keyboard: Use the arrow keys to control your movement. \n\
@@ -62,11 +61,13 @@ def getUserInput():
 		Mouse: Use the mouse to control your movement\n\
 			press m to select \n "
 		sys.stdout.write("{:<7}\n".format(keyboardOptionScreen))
-		c = getch.getch()
+		selectedCharacter = getch.getch()
 	print("The game will begin shortly...\n")
 
-	if c == 'k':
+	if selectedCharacter == 'k':
 		return Human((10,10), KeyInput())
+
+	""" Default to using the mouse """
 	return Human((10,10), MouseInput())
 
 def createAndStartGame(user):
