@@ -2,22 +2,28 @@
 
 #   movements.py
 #
-#   Sam Heilbron
-#   Last Updated: November 30, 2016
+#   Sam Heilbron, Rachel Marison
+#   Last Updated: December 9, 2016
 #
-#   List of movement classes
+#   List of movement classes:
+#       Circle_
 
-from enums import Direction, Color
 import threading
 import pygame
+from enums import Direction, Color
 
+###############################################################################
+##
+##                              Circle_ class
+##
+###############################################################################
 class Circle_(object):
-    """A Circle. Class circular blobs.
+    """A circular blob.
 
     Attributes:
         center: The center of the circle.
         radius: The radius of the circle.
-        positionMutex: Controls atomic access to centr and radius variables
+        positionMutex: Controls atomic access to center and radius variables
         direction: The current direction of the circle
         directionMutex: Controls atomic access to direction variable
         directions: Map of directions to movement methods
@@ -57,7 +63,7 @@ class Circle_(object):
             direction = self.__direction
         return direction
 
-
+    #------------------------- END PAGE 1 --------------------------#
     ##########################   SETTERS   ##########################
 
     def setCurrentDirection(self, direction):
@@ -71,8 +77,10 @@ class Circle_(object):
     def releasePosition(self):
         self.__positionMutex.release()
 
-    def move(self, game, user):
-        self.__directions[self.getCurrentDirection()](game.getGameboard(), user)
+    def move(self, user, game):
+        """ Move the user in the directio they are facing """
+        self.__directions[self.getCurrentDirection()](
+                                    game.getGameboard(), user)
         self._checkCollisions(game, user)
 
     def setCenter(self, newCenter):
@@ -80,6 +88,7 @@ class Circle_(object):
             self.__center = newCenter
 
     def increaseRadiusByN(self, radiusIncrease):
+        """ Grow the users size """
         with self.__positionMutex:
             self.__radius += radiusIncrease
 
@@ -114,6 +123,13 @@ class Circle_(object):
         if (row - (self.getRadius() + 1)) >= 0:
             gameboard.moveUser((col, row), (col, row - 1), user)
 
+    
+
+
+
+
+
+    #------------------------- END PAGE 2 --------------------------#
     def _goDown(self, gameboard, user):
         """ Move down """
         boardHeight = gameboard.getHeight()
@@ -127,7 +143,7 @@ class Circle_(object):
         return
 
     def _checkCollisions(self, game, user):
-        """ Go through all pixels in player's radius and 
+        """ Go through all pixels within player's radius and 
             check for a collision 
         """
         gameboard = game.getGameboard()
@@ -135,18 +151,17 @@ class Circle_(object):
         radius = self.getRadius()
         (width, height) = gameboard.getDimensions()
         for col in range(max(0, centerCol - radius), 
-                         min(height - 1, centerCol + radius)):
+                         min(height, centerCol + radius)):
             for row in range(max(0, centerRow - radius), 
-                             min(width - 1, centerRow + radius)):
+                             min(width, centerRow + radius)):
                 if gameboard.getLockAtPosition((col,row)).locked() \
                         and (col, row) != (centerCol, centerRow):
-                    print("Collision occured at (%s, %s)" % (col, row))
                     otherUserID = gameboard.getPlayerAtPosition((col, row))
                     self._handleCollisions(game, user, otherUserID)
                     return
 
     def _handleCollisions(self, game, currentUser, otherUserID):
-        """ Kill the blob and increase the size of the player """
+        """ Kill the smaller blob and increase the size of larger blob """
         try:
             otherUser = game.getUserFromID(otherUserID)
             if currentUser.getRadius() >= otherUser.getRadius():
@@ -158,11 +173,14 @@ class Circle_(object):
         except:
             """ It's possible that a user will be killed right before
                 it moves so the movement will still happen. This catches that
-                scenario since either otherUser.getRadius() or 
-                currentUser.getRadius() will fail since the user is None
+                scenario since otherUser.getRadius() will fail 
+                since the user is None
             """
             return
 
+        """ Hold the position of the user that is about to die to ensure
+            that it doesn't move and possibly collide with someone 
+        """
         center, radius = userToKill.holdPosition()
             
         userToLive.increaseRadiusByN(radius)

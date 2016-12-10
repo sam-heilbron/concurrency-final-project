@@ -2,11 +2,14 @@
 
 #   enums.py
 #
-#   Sam Heilbron
-#   Last Updated: November 28, 2016
+#   Sam Heilbron, Rachel Marison
+#   Last Updated: December 9, 2016
 #
-#   List of enums 
-#
+#   List of enums:
+#		Direction
+#		Color
+#		InitialUserRadius
+#		Timeout
 
 def enum(**named_values):
 	return type('Enum', (), named_values)
@@ -32,12 +35,7 @@ InitialUserRadius = enum(
 	HUMAN		= 10)
 
 Timeout = enum(
-	MOVEMENT 		= .001,
+	MOVEMENT 		= .0003,
 	DECISION 		= .05,
 	SLOWDECISION 	= .1,
 	GAMEOVER 		= .0001)
-
-# Frames per Second
-FPS = enum(
-	DECISION 		= 20,
-	SLOWDECISION	= 5)

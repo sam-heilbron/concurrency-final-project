@@ -1,3 +1,8 @@
-1. Change in getch-1.0 direction and run "python setup.py install"
+Installing getch and pygame:
+
+1. Change into getch-1.0 directory and run "python setup.py install". If errors occur while running the setup command, pip can also be used to install getch. Simply run the pip command shown at:
+    http://stackoverflow.com/questions/36714728/pip-install-getch-clang-error
+     
 2. Follow instructions at:
 	http://stackoverflow.com/questions/22974339/pygame-installation-issue-in-mac-os
+
