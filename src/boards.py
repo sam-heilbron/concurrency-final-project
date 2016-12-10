@@ -62,6 +62,8 @@ class SyncGameBoard(object):
         self.__background.fill(Color.WHITE)
 
 
+    
+    #------------------------- END PAGE 1 --------------------------#
     def _initializeTitle(self):
         """ Initialize the title to the display """
         titleFont = pygame.font.Font(None, 50)
@@ -124,6 +126,10 @@ class SyncGameBoard(object):
     def updateBackground(self):
         self.__display.blit(self.__background, (0, 0))
 
+    
+
+
+    #------------------------- END PAGE 2 --------------------------#
     def updateTimeClock(self, timeRemaining):
         """ Update the time that is visible to the user """
         timeFont = pygame.font.Font(None, 36)

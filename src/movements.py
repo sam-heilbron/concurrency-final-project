@@ -63,7 +63,7 @@ class Circle_(object):
             direction = self.__direction
         return direction
 
-
+    #------------------------- END PAGE 1 --------------------------#
     ##########################   SETTERS   ##########################
 
     def setCurrentDirection(self, direction):
@@ -128,6 +128,8 @@ class Circle_(object):
         if (row + (self.getRadius() + 1)) <= boardHeight:
             gameboard.moveUser((col, row), (col, row + 1), user)
 
+
+    #------------------------- END PAGE 2 --------------------------#
     def _stayInPlace(self, gameboard, user):
         """ Stay in place """
         return

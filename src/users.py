@@ -63,6 +63,7 @@ class Blob(object):
     def getRadius(self):
         return self.__movement.getRadius()
 
+    #------------------------- END PAGE 1 --------------------------#
     ##########################   SETTERS   ##########################
 
     def setCenter(self, newCenter):
@@ -128,6 +129,7 @@ class Human(Blob):
                                             initialCenter, 
                                             InitialUserRadius.HUMAN))
 
+    #------------------------- END PAGE 2 --------------------------#
     def start(self, game):
         """ Spin up a thread for moving """
         movementThread = threading.Thread(
@@ -193,6 +195,7 @@ class Food(AI):
         isDead: Event representing life of food. Triggered when eaten.
     """
 
+    #------------------------- END PAGE 3 --------------------------#
     def __init__(self, id_, initialCenter):
         """ Create an Food item """
         AI.__init__(    self, 

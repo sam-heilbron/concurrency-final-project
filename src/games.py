@@ -58,6 +58,12 @@ class Game(object):
             initialRandomAiCount,
             humanUser)
 
+    
+
+
+
+
+    #------------------------- END PAGE 1 --------------------------#
     def createUsers(self, foodCount, smartAiCount, randomAiCount, human):
         """ Create the oppponents and add them to the player list """
         maxWidth, maxHeight = self.__gameboard.getDimensions()
@@ -116,9 +122,18 @@ class Game(object):
     def _getRemainingTime(self):
         return int(self.__endTime - time.time())
 
+    
+
+
+
+
+
+
+    #------------------------- END PAGE 2 --------------------------#
     ##########################   SETTERS   ##########################
 
     def killUserWithID(self, userID):
+        """ Kill a user """
         try:
             u = self.getUserFromID(userID)
             u.quit()
@@ -142,6 +157,7 @@ class Game(object):
     ########################   START GAME   #########################
 
     def start(self):
+        """ Start the game """
         pygame.init()
         self.__gameboard.initialize()
 
@@ -168,6 +184,18 @@ class Game(object):
         self.__gameboard.placeUserOnBoard(user.getCenter(), user.getID())
 
 
+
+
+
+
+
+
+
+
+
+
+
+    #------------------------- END PAGE 3 --------------------------#
     #########################   END GAME   ##########################
 
     def _startGameOverListener(self):
@@ -227,6 +255,13 @@ class Game(object):
         while not self.__gameOverFlag.wait(timeout=Timeout.GAMEOVER):
             self._draw()
 
+    
+
+
+
+
+
+    #------------------------- END PAGE 4 --------------------------#
     def _draw(self):
         """ Draw the gameboard with all active users and time remaining """
         self.__gameboard.updateBackground()

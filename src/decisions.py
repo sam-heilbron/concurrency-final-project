@@ -63,6 +63,7 @@ class Stationary(Basic):
         user.isDead().wait()
 
 
+    #------------------------- END PAGE 1 --------------------------#
 ###############################################################################
 ##
 ##                              KeyInput class
@@ -127,6 +128,8 @@ class MouseInput(Basic):
                 the difference is negative. Therefore the mouse is to the left
     """
 
+
+    #------------------------- END PAGE 2 --------------------------#
     def __init__(self):
         self.__directions   = defaultdict(
             lambda: self.noTurn,
@@ -184,6 +187,15 @@ class AISmartInput(Basic):
                 the difference is negative. Therefore the mouse is to the left
     """ 
 
+    
+
+
+
+
+
+
+
+    #------------------------- END PAGE 3 --------------------------#
     def __init__(self):
         self.__directions   = defaultdict(
             lambda: self.noTurn,

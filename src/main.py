@@ -61,9 +61,11 @@ def getUserInput():
 		selectedCharacter = getch.getch()
 	print("The game will begin shortly...\n")
 
+
+
+	#------------------------- END PAGE 1 --------------------------#
 	if selectedCharacter == 'k':
 		return Human((10,10), KeyInput())
-
 	""" Default to using the mouse """
 	return Human((10,10), MouseInput())
 
