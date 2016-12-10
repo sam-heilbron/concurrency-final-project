@@ -2,11 +2,10 @@
 
 #   main.py
 #
-#   Sam Heilbron
-#   Rachel Marison
-#   Last Updated: December 7, 2016
+#   Sam Heilbron, Rachel Marison
+#   Last Updated: December 9, 2016
 #
-#   starts the game
+#   Starts the game
 
 import os, sys
 import getch

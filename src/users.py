@@ -3,9 +3,13 @@
 #   users.py
 #
 #   Sam Heilbron, Rachel Marison
-#   Last Updated: December 8, 2016
+#   Last Updated: December 9, 2016
 #
-#   List of user classes
+#   List of user classes:
+#       Human
+#       Food
+#       AISmart
+#       AIRandom
 
 import threading
 from decisions import Stationary, KeyInput, AIRandomInput, AISmartInput

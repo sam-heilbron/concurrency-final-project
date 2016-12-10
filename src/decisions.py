@@ -3,7 +3,7 @@
 #   decisions.py
 #
 #   Sam Heilbron, Rachel Marison
-#   Last Updated: December 8, 2016
+#   Last Updated: December 9, 2016
 #
 #   List of decision classes:
 #       Stationary
