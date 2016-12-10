@@ -12,7 +12,6 @@ import threading
 import pygame
 from enums import Color
 
-
 ###############################################################################
 ##
 ##                              SyncGameBoard class
@@ -30,7 +29,7 @@ class SyncGameBoard(object):
         background: pygame background
     """
 
-    def __init__(self, width = 800, height = 700):
+    def __init__(self, width = 700, height = 700):
         self.__width        = width
         self.__height       = height 
         self.__players      = self.initGameBoardPlayers()  
@@ -51,7 +50,8 @@ class SyncGameBoard(object):
     def _initializeDisplay(self):
         self.__display = pygame.display.set_mode(
                             (self.__width, self.__height), 
-                            pygame.FULLSCREEN)
+                            pygame.FULLSCREEN,
+                            32)
 
     def _initializeBackground(self):
         background = pygame.Surface(self.__display.get_size())
@@ -73,14 +73,13 @@ class SyncGameBoard(object):
 
     def initGameBoardLocks(self):
         """ Init the board with a value in each position """
-        return [[threading.Lock() for r in range(self.__width)] 
-                    for c in range(self.__height)]
+        return [[threading.Lock() for r in range(self.__width + 1)] 
+                    for c in range(self.__height + 1)]
         
     def initGameBoardPlayers(self):
-        """ This board holds players at their positions.
-            Board is initialized to None. """
-        return [[None for r in range(self.__width)] 
-                    for c in range(self.__height)]
+        """ This board holds players at their positions. """
+        return [[None for r in range(self.__width + 1)] 
+                    for c in range(self.__height + 1)]
 
     ##########################   GETTERS   ##########################          
 
@@ -104,8 +103,9 @@ class SyncGameBoard(object):
             (col, row) = centerPosition
             return self.__locks[row][col]
         except IndexError:
-            print("There was an error when trying to acquire lock at %s" \
-                % centerPosition)
+            print("There was an error when trying to acquire lock at r:%s, c: %s" \
+                % (row, col))
+            pass
 
     def getPlayerAtPosition(self, centerPosition):
         (col, row) = centerPosition
@@ -119,6 +119,12 @@ class SyncGameBoard(object):
     def updateBackground(self):
         self.__display.blit(self.__background, (0, 0))
 
+    def updateTimeClock(self, timeRemaining):
+        timeFont = pygame.font.Font(None, 36)
+        timeText = timeFont.render(str(timeRemaining), 1, Color.RED)
+        timeTextpos = timeText.get_rect(left = 30)
+        self.__display.blit(timeText, timeTextpos)
+
     def placeUserOnBoard(self, centerPosition, userID):
         self.getLockAtPosition(centerPosition).acquire()
         self._setPlayerAtPosition(centerPosition, userID)
@@ -128,9 +134,9 @@ class SyncGameBoard(object):
         self.getLockAtPosition(centerPosition).release()
 
     def moveUser(self, oldPosition, newPosition, user):
+        user.setCenter(newPosition)
         self.pullUserFromBoard(oldPosition)
         self.placeUserOnBoard(newPosition, user.getID())
-        user.setCenter(newPosition)
 
     ########################   PROTECTED   ##########################
 

@@ -77,7 +77,6 @@ class Blob(object):
         self.__movement.draw(self.__color)
 
     def quit(self):
-        print("Prepare to kill user: %s" % self.__id)
         self.__isDead.set()
 
     #########################   PROTECTED   #########################

@@ -28,6 +28,7 @@ def openingMessage():
 	""" Print a welcome message with directions about how to play """
 
 	os.system('clear')
+
 	print("Welcome to the game of tag. \n\
 	Your goal is to move your red player around the board. \n\
 	If you collide with another player, the larger one eats the other \n\
@@ -55,15 +56,15 @@ def getUserInput():
 	print("The game will begin shortly...\n")
 
 	if c == 'k':
-		return Human((100,200), KeyInput())
-	return Human((100,200), MouseInput())
+		return Human((10,10), KeyInput())
+	return Human((10,10), MouseInput())
 
 def createAndStartGame(user):
 	""" Create a game and start playing """
 
 	game = Game(
 			humanUser 				= user,
-			initialFoodCount 		= 25,
+			initialFoodCount 		= 20,
 			initialSmartAiCount 	= 1,
 			initialRandomAiCount	= 5)
 	game.start()

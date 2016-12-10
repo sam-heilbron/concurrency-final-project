@@ -141,12 +141,11 @@ class Circle_(object):
         radius = self.getRadius()
         (width, height) = gameboard.getDimensions()
         for col in range(max(0, centerCol - radius), 
-                         min(height - 1, centerCol + radius)):
+                         min(height, centerCol + radius)):
             for row in range(max(0, centerRow - radius), 
-                             min(width - 1, centerRow + radius)):
+                             min(width, centerRow + radius)):
                 if gameboard.getLockAtPosition((col,row)).locked() \
                         and (col, row) != (centerCol, centerRow):
-                    print("Collision occured at (%s, %s)" % (col, row))
                     otherUserID = gameboard.getPlayerAtPosition((col, row))
                     self._handleCollisions(game, user, otherUserID)
                     return
@@ -164,8 +163,8 @@ class Circle_(object):
         except:
             """ It's possible that a user will be killed right before
                 it moves so the movement will still happen. This catches that
-                scenario since either otherUser.getRadius() or 
-                currentUser.getRadius() will fail since the user is None
+                scenario since otherUser.getRadius() will fail 
+                since the user is None
             """
             return
 
