@@ -8,34 +8,34 @@ This is a game of tag, very similar to [agar.io](http://agar.io). Basically, use
 
 ### Included Files
 
-1. **main.py**: Prints out an opening message explaining the rules of the game to the user. It then prompts the user to select their preferred form of input (mouse or keyboard). A game is then started by creating and running an instance of the Game class
+* **main.py**: Prints out an opening message explaining the rules of the game to the user. It then prompts the user to select their preferred form of input (mouse or keyboard). A game is then started by creating and running an instance of the Game class
 
-+ **games.py**:
+* **games.py**:
 	Contains all possible game classes. A Game is a wrapper for all components of a game. It keeps track of the users alive in the game (userList). It also keeps track of the gameboard, which is described more in boards.py below. It sets up all the users, draws and redraws them on the board, and kills users that have been eaten. It also listens for the game to finish by waiting on the gameOverFlag, which is signaled when the human is eaten, and the gameOverTimeout, which is signaled when the game clock has run out.
 
-+ **boards.py**:
+* **boards.py**:
 	Contains all possible board classes. The SyncGameBoard class represents a thread-safe gameboard for the game. It handles creating a pygame display, a board containing the center position of all users, and a board containing locks for each position of the gameboard, thus allowing for atomic access on the gameboard. The SyncGameBoard is in charge of moving users from one place to another on the board as well as removing them once they have been eaten.
 
-+ **decisions.py**:
+* **decisions.py**:
 	Contains all possible decision classes. Decision classes represent the types of decisions that users make in order to move. All classes are built on top of the Basic class which connects the decision that is made to the movement class (see below).
-		* The **Stationary** class always decides to stay in place. 
-    	* The **KeyInput** class handles keyboard inputs to change the users direction.
-    	* The **MouseInput** class handles mouse movements to change the users direction.
-    	* The **AISmartInput** class decides to move towards where the human player is
-    	* The **AIRandomInput** class randomly chooses a direction to go in
+	  * The **Stationary** class always decides to stay in place. 
+   	  * The **KeyInput** class handles keyboard inputs to change the users direction.
+      * The **MouseInput** class handles mouse movements to change the users direction.
+      * The **AISmartInput** class decides to move towards where the human player is
+      * The **AIRandomInput** class randomly chooses a direction to go in
 
-+ **movements.py**:
+* **movements.py**:
 	Contains all the possible movement classes. In this game, all user blobs are circles and the Circle_ class handles the actual movement of the users.
        	*	**Circle_** contains attributes related to its position (center, radius) and a semphare is required to get and set these values. It also contains a direction attribute which it shares with a decision class and thus another semaphore ensures atomic access to this value.
        	*	The Circle class tells the board to update with it's new position and then is responsible for handling collisions. The Circle looks for locked positions on the gameboard that are within the radius of the circle.
 
-+ **users.py**:
+* **users.py**:
     Contains all the possible user classes. All users are built off the base Blob class. The Blob class has decision and  movement classes (explained above), a color to display to the screen, and id to distinguish them from other blobs and a threading event isDead which is triggered when the user is eaten. This event kills the threads which are controlling the users decision and movement threads.
         *	The **Human** class represent the human user in the game. The movement class is handled in a separate thread but pygame requires that IO be handled in the main thread.
         *	The **AI** class is a base class for all non-human users. Both movement and decision instances are handled in separate threads.
         *	**Food**, **AISmart**, and **AIRandom** all inherit the AI class and just vary in their attributes.
 
-+ **enums.py**:
+* **enums.py**:
 	This file contains all enumerations used in the code. These include **Direction**, **Color**, **InitialUserRaidus**, and **Timeout**.
 
 
