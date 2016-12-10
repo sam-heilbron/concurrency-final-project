@@ -2,10 +2,12 @@
 ## Final Project
 #### Authors: Rachel Marison, Sam Heilbron
 
- This is a game of tag, very similar to [Agar.io](Agar.io). Basically, users join a game and they move around an enclosed space as a spehere trying to "eat" others. When they do, they become larger and as a result slower. If you are eaten, you are eliminated. To "eat" someone you must completely overlap their positition with yours. Just touching them doesn't result in anything. There are also small food items sitting around that don't move and allow players to get food easily. Players may also split themselves in half, and have 2 smaller spheres moving around together. This allows them to move faster, but makes it harder to eat others since they're smaller.
+### Concept
+
+This is a game of tag, very similar to [http://agar.io](agar.io). Basically, users join a game and they move around an enclosed space as a spehere trying to "eat" others. When they do, they become larger and as a result slower. If you are eaten, you are eliminated. To "eat" someone you must completely overlap their positition with yours. Just touching them doesn't result in anything. There are also small food items sitting around that don't move and allow players to get food easily. Players may also split themselves in half, and have 2 smaller spheres moving around together. This allows them to move faster, but makes it harder to eat others since they're smaller.
 
 
-### Included Files:
+### Included Files
 
 1. **main.py**: Prints out an opening message explaining the rules of the game to the user. It then prompts the user to select their preferred form of input (mouse or keyboard). A game is then started by creating and running an instance of the Game class
 
@@ -38,8 +40,7 @@
 	This file contains all enumerations used in the code. These include **Direction**, **Color**, **InitialUserRaidus**, and **Timeout**.
 
 
-### Concurrency Challenges and Decisions:
-
+### Concurrency Challenges and Decisions
 	* Users decisions and movements
 		Since humans can make a decision to do something with their brain, while also doing something with their body, it makes sense for users of the game to have this capability. Therefore, the decision and movement classes are handled by 2 different threads. This successfully decouples 
 
