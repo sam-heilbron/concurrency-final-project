@@ -110,8 +110,8 @@ class SyncGameBoard(object):
             return self.__locks[row][col]
         except IndexError:
             """ See the README for information about this error """
-            print("There was an error when trying to acquire lock at r:%s, c: %s" \
-                % (row, col))
+            print("There was an error when trying to acquire lock \
+                at r:%s, c: %s" % (row, col))
             pass
 
     def getPlayerAtPosition(self, centerPosition):

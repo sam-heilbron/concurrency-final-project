@@ -78,7 +78,9 @@ class Circle_(object):
         self.__positionMutex.release()
 
     def move(self, user, game):
-        self.__directions[self.getCurrentDirection()](game.getGameboard(), user)
+        """ Move the user in the directio they are facing """
+        self.__directions[self.getCurrentDirection()](
+                                    game.getGameboard(), user)
         self._checkCollisions(game, user)
 
     def setCenter(self, newCenter):
@@ -86,6 +88,7 @@ class Circle_(object):
             self.__center = newCenter
 
     def increaseRadiusByN(self, radiusIncrease):
+        """ Grow the users size """
         with self.__positionMutex:
             self.__radius += radiusIncrease
 
@@ -120,6 +123,13 @@ class Circle_(object):
         if (row - (self.getRadius() + 1)) >= 0:
             gameboard.moveUser((col, row), (col, row - 1), user)
 
+    
+
+
+
+
+
+    #------------------------- END PAGE 2 --------------------------#
     def _goDown(self, gameboard, user):
         """ Move down """
         boardHeight = gameboard.getHeight()
@@ -128,8 +138,6 @@ class Circle_(object):
         if (row + (self.getRadius() + 1)) <= boardHeight:
             gameboard.moveUser((col, row), (col, row + 1), user)
 
-
-    #------------------------- END PAGE 2 --------------------------#
     def _stayInPlace(self, gameboard, user):
         """ Stay in place """
         return
